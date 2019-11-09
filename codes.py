@@ -16,3 +16,5 @@ class Codes:
     ls = 8
     make_dir = 9
     rmdir = 10
+
+    download_all = 50

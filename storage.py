@@ -59,10 +59,12 @@ class ClientListener(Thread):
         # dispatch the code
         if code == Codes.print:
             full_path = self.sock.recv(1024).decode('utf-8')
-            CommandHandler.handle_print(self.sock, full_path)
+            CommandHandler.handle_print_to(self.sock, full_path)
         elif code == Codes.upload:
             full_path = self.sock.recv(1024).decode('utf-8')
-            CommandHandler.handle_print(self.sock, full_path)
+            CommandHandler.handle_upload_from(self.sock, full_path)
+        elif code == Codes.download_all:
+            pass
         else:
             print("ClientListener: no command correspond to code", code)
 
@@ -83,6 +85,7 @@ def init_sync():
     sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     sock.connect((storage_ip, Constants.STORAGE_PORT))
     # TODO: gather all files from another storage
+
     # TODO: Also notify namenode that this node is clear now
 
 
@@ -104,13 +107,5 @@ def main():
             ClientListener(sck).start()
 
 
-def fly():
-    init_sync()
-
-    sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-    sock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
-    NamenodeListener(sock).start()
-
-
 if __name__ == '__main__':
-    fly()
+    main()

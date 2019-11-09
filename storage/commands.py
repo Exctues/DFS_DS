@@ -18,8 +18,7 @@ class CommandHandler:
         os.remove(full_path)
 
     @staticmethod
-    def handle_upload(socket: socket.socket, full_path):
-        # code for receiving file from a client
+    def handle_upload_from(socket: socket.socket, full_path):
         with open(full_path, 'wb+') as file:
             while data:
                 data = socket.recv(1024)
@@ -30,7 +29,7 @@ class CommandHandler:
                     return
 
     @staticmethod
-    def handle_print(socket: socket.socket, full_path):
+    def handle_print_to(socket: socket.socket, full_path):
         # code for sending file to a client
         with open(full_path, 'rb+') as file:
             data = file.read(1024)
@@ -45,9 +44,8 @@ class CommandHandler:
 
     @staticmethod
     def handle_make_file(full_path):
-        # wb+ creates a file
         with open(full_path, "wb+"):
-            pass
+            return
 
     @staticmethod
     def handle_rmdir(full_path):
