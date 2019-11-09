@@ -1,6 +1,5 @@
 from client.utils import *
 from constants import Constants
-from codes import Codes
 
 import os
 import socket
@@ -18,27 +17,21 @@ class Session:
         return self.__wd
 
     def change_curr_dir(self, path):
-        is_absolute = path[0] == Parameters.path_sep
-        path = path.strip('"' + Parameters.path_sep)
-
-        if is_absolute:
-            new_path = Parameters.path_sep + path
-        else:
-            if self.__wd[-1] != Parameters.path_sep:
-                self.__wd += Parameters.path_sep
-            new_path = self.__wd + path
-
-        new_path = self.__validate_path(new_path)
+        path = self.resolve_path(path)
+        new_path = self.__validate_path(path)
         if new_path:
             self.__wd = new_path
         else:
             handle_error("Path {} does not exist.".format(new_path))
 
     def resolve_path(self, path):
-        if path[0] == '/':
+        path = path.strip('"')
+
+        if path[0] == Parameters.path_sep:
             return path
         else:
-            return f"/{self.get_curr_dir().strip('/')}/{path.strip('/')}"
+            return f"{Parameters.path_sep}{self.get_curr_dir().strip(Parameters.path_sep)}" \
+                   f"{Parameters.path_sep}{path.strip(Parameters.path_sep)}"
 
     @staticmethod
     def __validate_path(path):

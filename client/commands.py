@@ -96,18 +96,20 @@ class CommandConfig:
 
         @staticmethod
         def make_file(session, args):
+            args = map(session.resolve_path, args)
             CommandConfig.Actions.__n_args_handler(session.send_command, Commands.make_file, args)
 
         @staticmethod
         def print(session, args):
+            args = map(session.resolve_path, args)
             session.handle_upload(Commands.print, args[0])
 
         @staticmethod
         def upload(session, args):
-            args = list(map(session.resolve_path, args))
             if len(args) == 1:
                 args.append(args[0])
 
+            args[1] = session.resolve_path(args[1])
             session.handle_upload(*args)
 
         @staticmethod
@@ -118,14 +120,17 @@ class CommandConfig:
         # Todo add handler
         @staticmethod
         def info(session, args):
+            args = map(session.resolve_path, args)
             session.send_command(Commands.info, args)
 
         @staticmethod
         def copy(session, args):
+            args = map(session.resolve_path, args)
             session.send_command(Commands.copy, args)
 
         @staticmethod
         def move(session, args):
+            args = map(session.resolve_path, args)
             session.send_command(Commands.move, args)
 
         @staticmethod
