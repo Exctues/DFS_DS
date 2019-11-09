@@ -18,3 +18,4 @@ class Codes:
     rmdir = 10
 
     download_all = 50
+    validate_path = 11
