@@ -1,4 +1,5 @@
 from client.utils import *
+from codes import Codes
 
 
 class Messages:
@@ -83,12 +84,17 @@ class CommandConfig:
 
     class Actions:
         @staticmethod
+        def __n_args_handler(action, command, args):
+            for arg in args:
+                action(command, arg)
+
+        @staticmethod
         def init(session, args):
             session.send_command(Commands.init, [])
 
         @staticmethod
         def make_file(session, args):
-            session.send_command(Commands.make_file, args)
+            CommandConfig.Actions.__n_args_handler(session.send_command, Commands.make_file, args)
 
         @staticmethod
         def print(session, args):
@@ -96,11 +102,14 @@ class CommandConfig:
 
         @staticmethod
         def upload(session, args):
+            if len(args) == 1:
+                args.append(args[0])
+
             session.send_command(Commands.upload, args)
 
         @staticmethod
         def rm(session, args):
-            session.send_command(Commands.rm, args)
+            CommandConfig.Actions.__n_args_handler(session.send_command, Commands.rm, args)
 
         @staticmethod
         def info(session, args):
@@ -124,15 +133,17 @@ class CommandConfig:
 
         @staticmethod
         def ls(session, args):
+            if len(args) == 0:
+                args.append(session.get_curr_dir())
             session.send_command(Commands.ls, args)
 
         @staticmethod
         def make_dir(session, args):
-            session.send_command(Commands.make_dir, args)
+            CommandConfig.Actions.__n_args_handler(session.send_command, Commands.make_dir, args)
 
         @staticmethod
         def rmdir(session, args):
-            session.send_command(Commands.rmdir, args)
+            CommandConfig.Actions.__n_args_handler(session.send_command, Commands.rmdir, args)
 
         @staticmethod
         def help(session, args):
@@ -145,30 +156,11 @@ class CommandConfig:
             else:
                 print_response(Messages.help_message())
 
-    class Codes:
-        help = -3
-        cd = -2
-        pwd = -1
-
-        init = 0
-
-        make_file = 1
-        print = 2
-        upload = 3
-        rm = 4
-        info = 5
-        copy = 6
-        move = 7
-
-        ls = 8
-        make_dir = 9
-        rmdir = 10
-
 
 class _Command:
     def __init__(self, name):
         self.__name = name
-        self.__code = getattr(CommandConfig.Codes, name)
+        self.__code = getattr(Codes, name)
         self.__description = getattr(CommandConfig.Description, name)
         self.__usage = name + " " + getattr(CommandConfig.Usage, name)
         self.__validate_nargs = getattr(CommandConfig.Validators, name)

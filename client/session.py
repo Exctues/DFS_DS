@@ -42,6 +42,14 @@ class Session:
 
         return 0
 
+    @staticmethod
+    def n_args_handler(command, args):
+        for arg in args:
+            Session.send_command(command, arg)
+
+
+# upload : flag to replicate
+
 
 
 
