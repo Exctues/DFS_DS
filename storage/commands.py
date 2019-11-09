@@ -1,5 +1,6 @@
 import os
 import shutil
+import socket
 
 
 class CommandHandler:
@@ -13,15 +14,29 @@ class CommandHandler:
         shutil.move(source, destination)
 
     @staticmethod
-    def handle_upload(full_path):
-        # code for receiving file from a client
-
-        pass
+    def handle_rm(full_path):
+        os.remove(full_path)
 
     @staticmethod
-    def handle_print(full_path):
+    def handle_upload_from(socket: socket.socket, full_path):
+        with open(full_path, 'wb+') as file:
+            while data:
+                data = socket.recv(1024)
+                if data:
+                    file.write(data)
+                    socket.send('1'.encode('utf-8'))
+                else:
+                    return
+
+    @staticmethod
+    def handle_print_to(socket: socket.socket, full_path):
         # code for sending file to a client
-        pass
+        with open(full_path, 'rb+') as file:
+            data = file.read(1024)
+            while data:
+                socket.send(data)
+                socket.recv(1)
+                data = file.read(1024)
 
     @staticmethod
     def handle_mkdir(full_path):
@@ -29,10 +44,9 @@ class CommandHandler:
 
     @staticmethod
     def handle_make_file(full_path):
-        # wb+ creates a file
         with open(full_path, "wb+"):
-            pass
+            return
 
     @staticmethod
     def handle_rmdir(full_path):
-        os.removedirs(full_path)
+        os.rmdir(full_path)

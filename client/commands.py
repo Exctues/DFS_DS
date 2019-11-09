@@ -100,19 +100,22 @@ class CommandConfig:
 
         @staticmethod
         def print(session, args):
-            session.send_command(Commands.print, args)
+            session.handle_upload(Commands.print, args[0])
 
         @staticmethod
         def upload(session, args):
+            args = list(map(session.resolve_path, args))
             if len(args) == 1:
                 args.append(args[0])
 
-            session.send_command(Commands.upload, args)
+            session.handle_upload(*args)
 
         @staticmethod
         def rm(session, args):
+            args = map(session.resolve_path, args)
             CommandConfig.Actions.__n_args_handler(session.send_command, Commands.rm, args)
 
+        # Todo add handler
         @staticmethod
         def info(session, args):
             session.send_command(Commands.info, args)
@@ -133,6 +136,7 @@ class CommandConfig:
         def pwd(session, args):
             print_response(session.get_curr_dir())
 
+        # Todo add handler
         @staticmethod
         def ls(session, args):
             if len(args) == 0:
