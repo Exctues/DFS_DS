@@ -5,6 +5,7 @@ from codes import Codes
 from storage.commands import CommandHandler
 from constants import Constants
 
+
 class NamenodeListener(Thread):
     def __init__(self, sock: socket.socket):
         super().__init__(daemon=True)
@@ -69,7 +70,8 @@ class ClientListener(Thread):
 
 def init_sync():
     sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-    sock.connect(Constants.NAMENODE_IP)
+    sock.connect((Constants.NAMENODE_IP, Constants.NEW_NODES_PORT))
+    to_sync = sock.recv(1024).decode()
 
 
 def main():
@@ -77,7 +79,7 @@ def main():
 
     sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     sock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
-    sock.bind(('',Constants.))
+    sock.bind(('', Constants.STORAGE_PORT))
     sock.listen()
     while True:
         sck, addr = sock.accept()
