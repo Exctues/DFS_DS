@@ -86,7 +86,9 @@ class CommandConfig:
         @staticmethod
         def __n_args_handler(action, command, args):
             for arg in args:
-                action(command, arg)
+                res = action(command, arg)
+                if not res:
+                    handle_error("Command failed to execute for argument {} (and all the following)".format(arg))
 
         @staticmethod
         def init(session, args):
