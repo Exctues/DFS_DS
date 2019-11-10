@@ -51,7 +51,7 @@ def multicast(cmd, arg1='', arg2=''):
         thread.start()
 
 
-def randomip():
+def random_ip():
     return random.sample(storage_nodes, 1).encode('utf-8')
 
 
@@ -80,8 +80,7 @@ def new_nodes_listener():
         while True:
             con, addr = soc.accept()
             with storage_nodes.lock:
-                storage_nodes.nodes.add(addr)
-            # TODO: переделать аддр на аддр(0) потому что аддр это тупл
+                storage_nodes.nodes.add(addr[0])
             # TODO: сторейдж стучиться два раза, второй раз когда она все скопировала и готова для отдачи
             con.send(random.sample(storage_nodes, 1).encode('utf-8'))
             # ack
@@ -108,7 +107,8 @@ while True:
         con.send('ok'.encode('utf-8'))
 
         if code == Codes.init:  # init
-            tree.wipe()
+            del tree
+            tree = FSTree()
             multicast(getattr(Codes, 'init'), '0')
 
         elif code == Codes.make_file:  # make_file (not dir)
@@ -129,7 +129,7 @@ while True:
             size = int(con.recv(1024).decode('utf-8'))
             # Handlers.upload(addr[0], addr[1], tree, size, filename, random.sample(storage_nodes, 1).encode('utf-8'))
             tree.insert(filename, size)
-            con.send(randomip().encode('utf-8'))
+            con.send(random_ip().encode('utf-8'))
 
         elif code == Codes.rm:  # rm
             filename = con.recv(1024).decode('utf-8')
@@ -162,7 +162,7 @@ while True:
 
         elif code == Codes.ls:  # ls
             source = con.recv(1024).decode('utf-8')
-            children = tree.find_node(source).children
+            children = tree.find_node(source).get_children()
             child_str = ';'.join(children)
             con.send(child_str.encode('utf-8'))
 
@@ -185,5 +185,3 @@ while True:
             else:
                 con.send(str(0).encode('utf-8'))
         con.shutdown(0)
-
-# TODO: доделать дерево ремув и вайп эсс

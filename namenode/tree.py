@@ -1,6 +1,3 @@
-import pprint
-
-
 class FSTree:
     def __init__(self):
         self.__root = self.DirNode('/')
@@ -39,6 +36,12 @@ class FSTree:
 
         return curr
 
+    def remove(self, path):
+        node = self.find_node(path)
+        if node is None:
+            return None
+        return node.erase()
+
     # Debugging
     def print_tree(self, level=-1, node=None):
         if node is None:
@@ -74,7 +77,7 @@ class FSTree:
         def name(self):
             return self.__name
 
-        def get_path(self):
+        def get_path(self) -> str:
             if self.parent is None:
                 return self.name
 
@@ -92,6 +95,14 @@ class FSTree:
                     return child
 
             return None
+
+        def get_children(self):
+            return [repr(child) for child in self.children]
+
+        def erase(self):
+            self.parent.children.remove(self)
+            del self
+            return True
 
         def __repr__(self):
             return self.name
@@ -142,23 +153,5 @@ class FSTree:
         def size(self):
             return self.__size
 
-        def __repr__(self):
-            return f"{self.get_path()} ({self.size} bytes) [{', '.join(self.ip_pool)}]"
-
-
-if __name__ == '__main__':
-    ip_addresses = ['192.168.0.1', '192.168.0.10', '127.0.0.1']
-
-    tree = FSTree()
-    tree.insert('/dev')
-    tree.insert('/var')
-    tree.insert('/home')
-    tree.insert('/home/daniel')
-    tree.insert('/home/alex')
-    tree.insert('/home/daniel/prog.py', 1000, ip_addresses)
-    tree.insert('/home/daniel/config.ini', 10)
-
-    node = tree.find_node('/home/daniel/../alex/')
-    print(node, end='\n'*2)
-
-    tree.print_tree()
+        def __str__(self):
+            return f"{self.get_path()} ({self.size} bytes)"
