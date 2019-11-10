@@ -70,6 +70,7 @@ class Session:
             sock.send(str(Codes.validate_path).encode('utf-8'))
             is_valid = int(sock.recv(1024).decode('utf-8'))
             if is_valid:
+                sock.send('ok'.encode('utf-8'))
                 true_path = sock.recv(1024).decode('utf-8')
             else:
                 handle_error("Path {} is invalid!".format(path))

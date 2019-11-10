@@ -176,8 +176,14 @@ while True:
             tree.remove(filepath)
             multicast(getattr(Codes, 'rmdir'), filepath)
         elif code == Codes.validate_path:
-            # TODO write
-            pass
+            filepath = con.recv(1024).decode('utf-8')
+            path = tree.find_node(filepath)
+            if path is not None:
+                con.send(str(1).encode('utf-8'))
+                con.recv(1024)
+                con.send(path.get_path().encode('utf-8'))
+            else:
+                con.send(str(0).encode('utf-8'))
         con.shutdown(0)
 
 # TODO: доделать дерево ремув и вайп эсс
