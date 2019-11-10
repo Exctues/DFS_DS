@@ -1,6 +1,8 @@
 from client.utils import *
 from codes import Codes
 
+from itertools import repeat
+
 
 class Messages:
     @staticmethod
@@ -85,10 +87,7 @@ class CommandConfig:
     class Actions:
         @staticmethod
         def __n_args_handler(action, command, args):
-            for arg in args:
-                res = action(command, arg)
-                if not res:
-                    handle_error("Command failed to execute for argument {} (and all the following)".format(arg))
+            map(action, repeat(command), args)
 
         @staticmethod
         def init(session, args):
@@ -96,12 +95,16 @@ class CommandConfig:
 
         @staticmethod
         def make_file(session, args):
-            args = map(session.resolve_path, args)
+            args = map(session.resolve_partial_path, args)
+            if not all(args):
+                return
             CommandConfig.Actions.__n_args_handler(session.send_command, Commands.make_file, args)
 
         @staticmethod
         def print(session, args):
-            args = map(session.resolve_path, args)
+            args = map(session.resolve_full_path, args)
+            if not all(args):
+                return
             session.handle_upload(Commands.print, args[0])
 
         @staticmethod
@@ -109,51 +112,74 @@ class CommandConfig:
             if len(args) == 1:
                 args.append(args[0])
 
-            args[1] = session.resolve_path(args[1])
+            args[1] = session.resolve_full_path(args[1])
+            if not args[1]:
+                return
+
             session.handle_upload(*args)
 
         @staticmethod
         def rm(session, args):
-            args = map(session.resolve_path, args)
+            args = map(session.resolve_full_path, args)
+            if not all(args):
+                return
             CommandConfig.Actions.__n_args_handler(session.send_command, Commands.rm, args)
 
-        # Todo add handler
         @staticmethod
         def info(session, args):
-            args = map(session.resolve_path, args)
+            args = map(session.resolve_full_path, args)
+            if not all(args):
+                return
             session.send_command(Commands.info, args)
 
         @staticmethod
         def copy(session, args):
-            args = map(session.resolve_path, args)
+            args[0] = session.resolve_full_path(args[0])
+            if not all(args):
+                return
             session.send_command(Commands.copy, args)
 
         @staticmethod
         def move(session, args):
-            args = map(session.resolve_path, args)
+            args[0] = session.resolve_full_path(args[0])
+            args[1] = session.resolve_partial_path(args[1])
+            if not all(args):
+                return
             session.send_command(Commands.move, args)
 
         @staticmethod
         def cd(session, args):
+            args = map(session.resolve_partial_path, args)
+            if not all(args):
+                return
             session.change_curr_dir(args[0])
 
         @staticmethod
         def pwd(session, args):
             print_response(session.get_curr_dir())
 
-        # Todo add handler
         @staticmethod
         def ls(session, args):
             if len(args) == 0:
                 args.append(session.get_curr_dir())
+            args[0] = session.resolve_full_path(args[0])
+            if not args[0]:
+                return
+
             session.send_command(Commands.ls, args)
 
         @staticmethod
         def make_dir(session, args):
+            args = map(session.resolve_partial_path, args)
+            if not all(args):
+                return
             CommandConfig.Actions.__n_args_handler(session.send_command, Commands.make_dir, args)
 
         @staticmethod
         def rmdir(session, args):
+            args = map(session.resolve_full_path, args)
+            if not all(args):
+                return
             CommandConfig.Actions.__n_args_handler(session.send_command, Commands.rmdir, args)
 
         @staticmethod

@@ -33,5 +33,6 @@ def print_response(message):
 
 class Parameters:
     disable_color = False
-    path_sep = '/'
+    sep = '/'
+    path_sep = ';'
     interactive = True
