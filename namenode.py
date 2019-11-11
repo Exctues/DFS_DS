@@ -91,6 +91,7 @@ def new_nodes_listener():
             # i_clear = 15
 
             con, addr = soc.accept()
+            print('new connection')
             code = int(con.recv(1024).decode('utf-8'))
 
             if code == Codes.i_clear:
@@ -98,11 +99,18 @@ def new_nodes_listener():
                 clean_nodes.nodes.add(addr[0])
 
             elif code == Codes.init_new_storage:
-                dirty_nodes.nodes.add(addr[0])
-                con.send(random_ip().encode('utf-8'))
+                if len(clean_nodes.nodes) > 0:
+                    dirty_nodes.nodes.add(addr[0])
+                    con.send(random_ip().encode('utf-8'))
+                else:
+                    con.send('-1'.encode('utf-8'))
+                    clean_nodes.nodes.add(addr[0])
 
             elif code == Codes.get_all_storage_ips:
-                con.send(';'.join(clean_nodes.nodes).encode('utf-8'))
+                if len(clean_nodes.nodes) > 0:
+                    con.send(';'.join(clean_nodes.nodes).encode('utf-8'))
+                else:
+                    con.send('-1'.encode('utf-8'))
 
             con.shutdown(0)
 
