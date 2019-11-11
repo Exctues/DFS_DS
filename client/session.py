@@ -12,6 +12,7 @@ class Session:
         self.__wd = "/"
         self.interactive = interactive
 
+    @logger.log
     def print_curr_dir(self, *args):
         logger.print_info(self.get_curr_dir())
 
@@ -21,6 +22,7 @@ class Session:
     def change_curr_dir(self, path):
         self.__wd = path
 
+    @logger.log
     def resolve_partial_path(self, path, new_length=1):
         """
         For commands like make_file and make_dir.
@@ -44,12 +46,18 @@ class Session:
 
         res = f"{parameters.sep}{parameters.sep.join(part_path)}" \
               f"{parameters.sep}{parameters.sep.join(new_path)}"
+        if parameters.verbose:
+            logger.print_debug_info("{} -> {}".format(parameters.path_sep + parameters.path_sep.join(path), res))
 
         return res
 
+    @logger.log
     def resolve_full_path(self, path):
         res = self.__build_path(path)
         res = self.validate_path(res)
+        if parameters.verbose:
+            logger.print_debug_info("{} -> {}".format(path, res))
+
         return res
 
     def __build_path(self, path):
@@ -80,6 +88,7 @@ class Session:
         return true_path
 
     @staticmethod
+    @logger.log
     def handle_info(command, args):
         sock = Session.send_command(command, args, close_socket=False)
         filename = sock.recv(1024).decode('utf-8')
@@ -91,6 +100,7 @@ class Session:
         sock.shutdown(0)
 
     @staticmethod
+    @logger.log
     def handle_ls(command, args):
         sock = Session.send_command(command, args, close_socket=False)
         l = sock.recv(1024).decode('utf-8')
@@ -99,6 +109,7 @@ class Session:
         sock.shutdown(0)
 
     @staticmethod
+    @logger.log
     def handle_upload(command, args):
         assert len(args) == 2
         if not os.path.isfile(args[0]):
@@ -125,6 +136,7 @@ class Session:
                     data = host_file.read(1024)
 
     @staticmethod
+    @logger.log
     def handle_print(command, source):
         sock = Session.send_command(command, (source,), close_socket=False)
         ip = sock.recv(1024).decode('utf-8')
@@ -144,6 +156,7 @@ class Session:
                     return
 
     @staticmethod
+    @logger.log
     def send_command(command, args, close_socket=True):
         # Send command to the namenode, send arguments and return socket
 

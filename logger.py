@@ -1,5 +1,5 @@
 import parameters
-
+import itertools
 
 class Colors:
     OKBLUE = '\033[94m'
@@ -23,25 +23,29 @@ class Colors:
         Colors.UNDERLINE = ''
 
 
-def handle_error(message):
-    print(Colors.colored(message, Colors.FAIL, Colors.BOLD))
+def __build_print_message(*args, sep=' ', end = '\n'):
+    return sep.join(args) + end
 
 
-def print_info(message):
-    print(Colors.colored(message, Colors.OKBLUE, Colors.BOLD))
+def handle_error(*args, sep=' ', end='\n'):
+    print(Colors.colored(sep.join(args) + end, Colors.FAIL, Colors.BOLD))
 
 
-def print_debug_info(*message):
-    print(Colors.colored(" ".join(message), Colors.OKGREEN))
+def print_info(*args, sep=' ', end='\n'):
+    print(Colors.colored(sep.join(args) + end, Colors.OKBLUE, Colors.BOLD), end='')
+
+
+def print_debug_info(*args, sep=' ', end='\n'):
+    print(Colors.colored(sep.join(args) + end, Colors.OKGREEN), end='')
 
 
 def log(func):
     def wrapper(*args, **kwargs):
         func_str = func.__name__
         args_str = ', '.join(args)
-        # kwargs_str = ', '.join([':'.join([str(j) for j in i]) for i in kwargs.iteritems()])
-        print("Function:", func_str, "args:", args_str)
-        # print(kwargs_str)
+        kwargs_str = ', '.join([':'.join([str(j) for j in i]) for i in kwargs.values()])
+        if parameters.verbose:
+            print_debug_info("Function:", func_str, "args:", args_str, "kwargs:", kwargs_str)
         return func(*args, **kwargs)
 
     return wrapper
