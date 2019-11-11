@@ -85,7 +85,7 @@ class Session:
         # ack
         sock.send('ok'.encode('utf-8'))
         size = sock.recv(1024).decode('utf-8')
-        print_response("{}\t{}".format(filename, size))
+        print_response("{}\t{} bytes".format(filename, size))
 
         sock.shutdown(0)
 
@@ -102,6 +102,7 @@ class Session:
         assert len(args) == 2
         if not os.path.isfile(args[0]):
             handle_error("Incorrect host path specified!")
+            return
 
         with open(args[0], 'rb') as host_file:
             size = str(os.path.getsize(args[0]))
@@ -113,6 +114,8 @@ class Session:
             with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as sock:
                 sock.connect((ip, Constants.STORAGE_PORT))
                 sock.send(args[1])
+                sock.recv(1024)
+                sock.send('1'.encode('utf-8'))
                 data = host_file.read(1024)
 
                 while data:
