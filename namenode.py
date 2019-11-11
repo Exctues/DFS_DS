@@ -136,15 +136,18 @@ while True:
             del tree
             tree = FSTree()
             multicast(Codes.init)
+            logger.print_debug_info('init success')
 
         elif code == Codes.make_file: # make_file (not dir)
             filepath = con.recv(1024).decode('utf-8')
             tree.insert(filepath, 0)
             multicast(Codes.make_file, filepath)
+            logger.print_debug_info('makefile success')
 
         elif code == Codes.print: # print # download
             source = con.recv(1024).decode('utf-8')
             con.send(random_ip().encode('utf-8'))
+
 
         elif code == Codes.upload: # upload
             filename = con.recv(1024).decode('utf-8')
@@ -202,9 +205,12 @@ while True:
             path = tree.find_node(filepath)
             if path is not None:
                 con.send(str(1).encode('utf-8'))
+                logger.print_debug_info('validate path send 1 ')
                 # ack
                 con.recv(1024)
                 con.send(path.get_path().encode('utf-8'))
+                logger.print_debug_info('validate path send path')
             else:
                 con.send(str(0).encode('utf-8'))
+                logger.print_debug_info('validate path send 0')
         con.close()
