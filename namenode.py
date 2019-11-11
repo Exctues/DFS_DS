@@ -18,7 +18,8 @@ class Nodes:
 
 
 # all storage nodes
-storage_nodes = Nodes()
+clean_nodes = Nodes()
+dirty_nodes = Nodes()
 
 
 def send_args(ip, port, cmd, arg1='', arg2=''):
@@ -30,12 +31,12 @@ def send_args(ip, port, cmd, arg1='', arg2=''):
         # acknowledge
         a = sock.recv(1024).decode('utf-8')
         sock.send(arg1.encode('utf-8'))
-        if arg2 != '':
-            # acknowledge
-            a = sock.recv(1024).decode('utf-8')
-            sock.send(arg2.encode('utf-8'))
+    if arg2 != '':
+        # acknowledge
+        a = sock.recv(1024).decode('utf-8')
+        sock.send(arg2.encode('utf-8'))
 
-    sock.close()
+    sock.shutdown(0)
 
 
 def multicast(cmd, arg1='', arg2=''):
@@ -46,24 +47,29 @@ def multicast(cmd, arg1='', arg2=''):
     :param arg2:
     :return:
     """
-    for ip in storage_nodes.nodes:
+
+    # wait for all the dirty nodes to become clean
+    while len(dirty_nodes.nodes) > 0:
+        pass
+
+    for ip in clean_nodes.nodes:
         thread = Thread(target=send_args, args=[ip, Constants.STORAGE_PORT, cmd, arg1, arg2])
         thread.start()
 
 
 def random_ip():
-    return random.sample(storage_nodes, 1).encode('utf-8')
+    return random.sample(clean_nodes, 1).encode('utf-8')
 
 
 # thread that pings nodes and modify storage_nodes
 def ping():
     def ping_thread():
         while True:
-            for ip in storage_nodes.nodes.copy():
+            for ip in clean_nodes.nodes.copy():
                 response = os.system("ping -c 1 " + ip)
                 if response != 0:
-                    with storage_nodes.lock:
-                        storage_nodes.nodes.discard(ip)
+                    with clean_nodes.lock:
+                        clean_nodes.nodes.discard(ip)
             time.sleep(30)
 
     heartbeat = Thread(target=ping_thread)
@@ -79,14 +85,16 @@ def new_nodes_listener():
         soc.listen()
         while True:
             con, addr = soc.accept()
-            with storage_nodes.lock:
-                storage_nodes.nodes.add(addr[0])
-            # TODO: сторейдж стучиться два раза, второй раз когда она все скопировала и готова для отдачи
-            con.send(random.sample(storage_nodes, 1).encode('utf-8'))
+            if addr[0] in dirty_nodes.nodes:
+                dirty_nodes.nodes.discard(addr[0])
+                clean_nodes.nodes.add(addr[0])
+            else:
+                dirty_nodes.nodes.add(addr[0])
+                con.send(random.sample(clean_nodes, 1).encode('utf-8'))
             # ack
             # a = con.recv(1024).decode('utf-8')
 
-            con.close()
+            con.shutdown(0)
 
     new_nodes_listener = Thread(target=new_nodes_listener_thread)
     new_nodes_listener.start()
@@ -120,7 +128,7 @@ while True:
         elif code == Codes.print:  # print # download
             source = con.recv(1024).decode('utf-8')
             # Handlers.print(addr[0], addr[1], random.sample(storage_nodes, 1).encode('utf-8'))
-            randomip = random.sample(storage_nodes, 1).encode('utf-8')
+            randomip = random.sample(clean_nodes, 1).encode('utf-8')
             con.send(randomip().encode('utf-8'))
 
         elif code == Codes.upload:  # upload
