@@ -1,10 +1,12 @@
 from client.commands import *
 from client.session import Session
 import parameters
+from constants import Constants
 import logger
 
 import argparse
 import sys
+import os
 
 interactive = len(sys.argv) == 1
 
@@ -51,6 +53,13 @@ def interactive_loop(parser: argparse.ArgumentParser):
 
 
 def main():
+    try:
+        import socket
+        socket.create_connection((Constants.NAMENODE_IP, Constants.CLIENT_TO_NAMENODE))
+    except:
+        logger.handle_error("Could not reach namenode server. Try again later.")
+        exit(-1)
+
     if parameters.disable_color:
         logger.Colors.disable()
 
