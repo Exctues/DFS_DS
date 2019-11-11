@@ -6,7 +6,7 @@ import logger
 
 import argparse
 import sys
-import os
+import threading
 
 interactive = len(sys.argv) == 1
 
@@ -31,7 +31,10 @@ class CommandAction(argparse.Action):
             logger.handle_error(Messages.wrong_argnumber_message(command))
             return
 
-        command(self.__session, values[1:])
+        thread = threading.Thread(target=command, args=(self.__session, values[1:]))
+        thread.start()
+        thread.join()
+        # command(self.__session, values[1:])
 
 
 def setup_argparse():
@@ -52,16 +55,20 @@ def interactive_loop(parser: argparse.ArgumentParser):
         parser.parse_args(curr_command)
 
 
-def main():
+def check_connection():
     try:
         import socket
         sock = socket.create_connection((Constants.NAMENODE_IP, Constants.CLIENT_TO_NAMENODE))
         sock.send('-100'.encode('utf-8'))
-        sock.shutdown(0)
+        # sock.shutdown(0)
+        sock.close()
+
     except:
         logger.handle_error("Could not reach namenode server. Try again later.")
         exit(-1)
 
+
+def main():
     if parameters.disable_color:
         logger.Colors.disable()
 
@@ -75,4 +82,3 @@ def main():
 
 if __name__ == '__main__':
     main()
-

@@ -35,7 +35,9 @@ class Session:
                             None, is the path could not be found
         """
         res = self.__build_path(path)
+        logger.print_debug_info("built partial path:", res)
         path = res.split(parameters.sep)
+        path = filter(lambda path: path != '', path)
         part_path = path[:-new_length]
         new_path = path[-new_length:]
         part_path = parameters.sep + parameters.sep.join(part_path)
@@ -46,8 +48,8 @@ class Session:
 
         res = f"{parameters.sep}{parameters.sep.join(part_path)}" \
               f"{parameters.sep}{parameters.sep.join(new_path)}"
-        if parameters.verbose:
-            logger.print_debug_info("{} -> {}".format(parameters.path_sep + parameters.path_sep.join(path), res))
+
+        logger.print_debug_info("{} -> {}".format(parameters.path_sep + parameters.path_sep.join(path), res))
 
         return res
 
@@ -79,9 +81,11 @@ class Session:
             sock.send(str(Codes.validate_path).encode('utf-8'))
             is_valid = int(sock.recv(1024).decode('utf-8'))
             if is_valid:
+                logger.print_debug_info("Valid")
                 sock.send('ok'.encode('utf-8'))
                 true_path = sock.recv(1024).decode('utf-8')
             else:
+                logger.print_debug_info("Invalid")
                 logger.handle_error("Path {} is invalid!".format(path))
                 true_path = None
 
@@ -97,7 +101,8 @@ class Session:
         size = sock.recv(1024).decode('utf-8')
         logger.print_info("{}\t{} bytes".format(filename, size))
 
-        sock.shutdown(0)
+        # sock.shutdown(0)
+        sock.close()
 
     @staticmethod
     @logger.log
@@ -106,7 +111,8 @@ class Session:
         l = sock.recv(1024).decode('utf-8')
         l = l.split(parameters.path_sep)
         logger.print_info('\n'.join(l))
-        sock.shutdown(0)
+        # sock.shutdown(0)
+        sock.close()
 
     @staticmethod
     @logger.log
@@ -121,7 +127,8 @@ class Session:
 
             sock = Session.send_command(command, (args[1], size), close_socket=False)
             ip = sock.recv(1024).decode('utf-8')
-            sock.shutdown(0)
+            # sock.shutdown(0)
+            sock.close()
 
             with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as sock:
                 sock.connect((ip, Constants.STORAGE_PORT))
@@ -135,12 +142,15 @@ class Session:
                     sock.recv(1)
                     data = host_file.read(1024)
 
+                sock.close()
+
     @staticmethod
     @logger.log
     def handle_print(command, source):
         sock = Session.send_command(command, (source,), close_socket=False)
         ip = sock.recv(1024).decode('utf-8')
-        sock.shutdown(0)
+        # sock.shutdown(0)
+        sock.close()
 
         with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as sock:
             sock.connect((ip, Constants.STORAGE_PORT))
@@ -172,7 +182,8 @@ class Session:
             logger.print_debug_info("Sent arg", arg)
 
         if close_socket:
-            sock.shutdown(0)
+            # sock.shutdown(0)
+            sock.close()
             return True
 
         return sock
