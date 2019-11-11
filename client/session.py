@@ -44,12 +44,11 @@ class Session:
         new_path = path[-new_length:]
         part_path = parameters.sep + parameters.sep.join(part_path)
         part_path = self.validate_path(part_path)
+        logger.print_debug_info("Received from validate_path:", part_path)
         if part_path:
             part_path = part_path.strip(parameters.sep)
         else:
             logger.handle_error("Path is not valid")
-
-        if part_path is None:
             return None
 
         res = f"{parameters.sep}{parameters.sep.join(part_path)}" \
