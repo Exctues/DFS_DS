@@ -1,5 +1,5 @@
-from client.utils import *
 from codes import Codes
+import logger
 
 from itertools import repeat
 
@@ -156,7 +156,7 @@ class CommandConfig:
 
         @staticmethod
         def pwd(session, args):
-            print_response(session.get_curr_dir())
+            logger.print_info(session.get_curr_dir())
 
         @staticmethod
         def ls(session, args):
@@ -187,11 +187,11 @@ class CommandConfig:
             if args:
                 command = getattr(Commands, args[0], None)
                 if not command:
-                    handle_error(Messages.wrong_command_message(args[0]))
+                    logger.handle_error(Messages.wrong_command_message(args[0]))
                 else:
-                    print_response("{}: {}\n{}".format(command.name, command.usage, command.description))
+                    logger.print_info("{}: {}\n{}".format(command.name, command.usage, command.description))
             else:
-                print_response(Messages.help_message())
+                logger.print_info(Messages.help_message())
 
 
 class _Command:
