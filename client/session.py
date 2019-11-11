@@ -43,7 +43,11 @@ class Session:
         part_path = path[:-new_length]
         new_path = path[-new_length:]
         part_path = parameters.sep + parameters.sep.join(part_path)
-        part_path = self.validate_path(part_path).strip(parameters.sep)
+        part_path = self.validate_path(part_path)
+        if part_path:
+            part_path = part_path.strip(parameters.sep)
+        else:
+            logger.handle_error("Path is not valid")
 
         if part_path is None:
             return None
@@ -87,7 +91,7 @@ class Session:
             try:
                 is_valid = int(is_valid)
             except:
-                logger.print_debug_info()
+                logger.print_debug_info("Couldn't cast to int")
                 return False
 
             if is_valid:
