@@ -154,4 +154,5 @@ class FSTree:
             return self.__size
 
         def __str__(self):
-            return f"{self.get_path()} ({self.size} bytes)"
+            return str(self.get_path())+' ('+str(self.size)+' bytes)'
+            # return f"{self.get_path()} ({self.size} bytes)"
