@@ -35,7 +35,9 @@ class Session:
                             None, is the path could not be found
         """
         res = self.__build_path(path)
+        logger.print_debug_info("built partial path:", res)
         path = res.split(parameters.sep)
+        path = filter(lambda path: path != '', path)
         part_path = path[:-new_length]
         new_path = path[-new_length:]
         part_path = parameters.sep + parameters.sep.join(part_path)
@@ -46,8 +48,8 @@ class Session:
 
         res = f"{parameters.sep}{parameters.sep.join(part_path)}" \
               f"{parameters.sep}{parameters.sep.join(new_path)}"
-        if parameters.verbose:
-            logger.print_debug_info("{} -> {}".format(parameters.path_sep + parameters.path_sep.join(path), res))
+
+        logger.print_debug_info("{} -> {}".format(parameters.path_sep + parameters.path_sep.join(path), res))
 
         return res
 
@@ -79,9 +81,11 @@ class Session:
             sock.send(str(Codes.validate_path).encode('utf-8'))
             is_valid = int(sock.recv(1024).decode('utf-8'))
             if is_valid:
+                logger.print_debug_info("Valid")
                 sock.send('ok'.encode('utf-8'))
                 true_path = sock.recv(1024).decode('utf-8')
             else:
+                logger.print_debug_info("Invalid")
                 logger.handle_error("Path {} is invalid!".format(path))
                 true_path = None
 
