@@ -37,7 +37,9 @@ class Session:
         res = self.__build_path(path)
         logger.print_debug_info("built partial path:", res)
         path = res.split(parameters.sep)
-        path = filter(lambda path: path != '', path)
+        path = list(filter(lambda path: path != '', path))
+        # if len(path) <= 1:
+            # return path
         part_path = path[:-new_length]
         new_path = path[-new_length:]
         part_path = parameters.sep + parameters.sep.join(part_path)
