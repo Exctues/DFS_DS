@@ -117,6 +117,8 @@ def new_nodes_listener():
     new_nodes_listener = Thread(target=new_nodes_listener_thread)
     new_nodes_listener.start()
 
+ping()
+new_nodes_listener()
 
 tree = FSTree()
 
