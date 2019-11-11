@@ -30,6 +30,7 @@ class CommandHandler:
     @logger.log
     def handle_upload_from(socket: socket.socket, full_path):
         # receiving file from a client
+        logger.print_debug_info("Sending", full_path)
         with open(os.path.join(Constants.STORAGE_PATH, full_path), 'wb+') as file:
             while data:
                 data = socket.recv(1024)
@@ -43,6 +44,7 @@ class CommandHandler:
     @logger.log
     def handle_print_to(socket: socket.socket, full_path):
         # sending file to a client
+        logger.print_debug_info("Receiving", full_path)
         with open(os.path.join(Constants.STORAGE_PATH, full_path), 'rb') as file:
             data = file.read(1024)
             while data:
@@ -58,7 +60,9 @@ class CommandHandler:
            for simplicity of code.
         """
 
+        @logger.log
         def ask(code, full_path):
+
             sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
             sock.connect(address)
             sock.send(str(code).encode('utf-8'))
@@ -97,7 +101,7 @@ class CommandHandler:
             sock.connect((ip, Constants.STORAGE_PORT))
             # Check if another storage doesn't have a file
             if not CommandHandler._has_file(sock, full_path):
-                print("Distributing", full_path)
+                logger.print_debug_info("Distributing", full_path)
                 sock.send(full_path.encode('utf-8'))
                 sock.recv(1024)
                 CommandHandler.handle_print_to(sock, full_path)

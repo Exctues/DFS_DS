@@ -15,6 +15,7 @@ class NamenodeListener(Thread):
     def run(self):
         code = int(self.sock.recv(4).decode('utf-8'))
         self.sock.send('ok'.encode('utf-8'))
+        logger.print_debug_info(code)
 
         if code == Codes.make_file:
             full_path = self.sock.recv(1024).decode('utf-8')
@@ -58,6 +59,7 @@ class ClientListener(Thread):
     def run(self):
         code = self.sock.recv(1024).decode('utf-8')
         self.sock.send('ok'.encode('utf-8'))
+        logger.print_debug_info(code)
 
         if code == Codes.print:
             full_path = self.sock.recv(1024).decode('utf-8')
@@ -101,13 +103,21 @@ def notify_i_clear():
 
 
 @logger.log
+def remove_and_create_storage_dirs():
+    if os.path.exists(Constants.STORAGE_PATH):
+        os.removedirs(Constants.STORAGE_PATH)
+        logger.print_debug_info(Constants.STORAGE_PATH, "removed")
+        # then create this dir empty
+    os.makedirs(Constants.STORAGE_PATH)
+    logger.print_debug_info(Constants.STORAGE_PATH, "(re)created")
+
+
+@logger.log
 def init_sync():
     # First we delete everything we have
     # because we don't resurrect old nodes.
-    if os.path.exists(Constants.STORAGE_PATH):
-        os.removedirs(Constants.STORAGE_PATH)
-    # then create this dir empty
-    os.makedirs(Constants.STORAGE_PATH)
+    remove_and_create_storage_dirs()
+
     storage_ip = get_sync_storage_ip()
     if storage_ip == '-1':
         return
