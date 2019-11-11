@@ -26,7 +26,7 @@ def send_args(ip, port, cmd, arg1='', arg2=''):
     sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     sock.connect((ip, port))
 
-    sock.send(cmd.encode('utf-8'))
+    sock.send(str(cmd).encode('utf-8'))
     if arg1 != '':
         # acknowledge
         sock.recv(1024)
