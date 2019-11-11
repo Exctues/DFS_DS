@@ -17,5 +17,9 @@ class Codes:
     make_dir = 9
     rmdir = 10
 
-    download_all = 50
     validate_path = 11
+
+    get_all_storage_ips = 12
+    init_new_storage = 13
+    download_all = 14
+    i_clear = 15

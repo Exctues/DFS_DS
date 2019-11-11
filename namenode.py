@@ -29,11 +29,11 @@ def send_args(ip, port, cmd, arg1='', arg2=''):
     sock.send(cmd.encode('utf-8'))
     if arg1 != '':
         # acknowledge
-        a = sock.recv(1024).decode('utf-8')
+        sock.recv(1024)
         sock.send(arg1.encode('utf-8'))
     if arg2 != '':
         # acknowledge
-        a = sock.recv(1024).decode('utf-8')
+        sock.recv(1024)
         sock.send(arg2.encode('utf-8'))
 
     sock.shutdown(0)
@@ -84,6 +84,10 @@ def new_nodes_listener():
         soc.bind(('', Constants.NEW_NODES_PORT))
         soc.listen()
         while True:
+            # TODO:  need to deal with 3 codes:
+            # get_all_storage_ips = 12
+            # init_new_storage = 13
+            # i_clear = 15
             con, addr = soc.accept()
             if addr[0] in dirty_nodes.nodes:
                 dirty_nodes.nodes.discard(addr[0])

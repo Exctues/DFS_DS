@@ -12,10 +12,9 @@ class NamenodeListener(Thread):
         self.sock = sock
 
     def run(self):
-        # wait for a code
         code = int(self.sock.recv(4).decode('utf-8'))
         self.sock.send('ok'.encode('utf-8'))
-        # dispatch the code
+
         if code == Codes.make_file:
             full_path = self.sock.recv(1024).decode('utf-8')
             CommandHandler.handle_make_file(full_path)
@@ -41,8 +40,7 @@ class NamenodeListener(Thread):
         else:
             print("NamenodeListener: no command correspond to code", code)
 
-        # TODO if doesn't work change to shutdown()
-        self.sock.close()
+        self.sock.shutdown(1)
 
 
 class ClientListener(Thread):
@@ -56,54 +54,81 @@ class ClientListener(Thread):
     def run(self):
         code = self.sock.recv(4).decode('utf-8')
         self.sock.send('ok'.encode('utf-8'))
-        # dispatch the code
+
         if code == Codes.print:
             full_path = self.sock.recv(1024).decode('utf-8')
             CommandHandler.handle_print_to(self.sock, full_path)
         elif code == Codes.upload:
-            full_path = self.sock.recv(1024).decode('utf-8')
+            full_path, need_distribute = self.sock.recv(1024).decode('utf-8').split(' ')
+            self.sock.send('ok'.encode('utf-8'))
             CommandHandler.handle_upload_from(self.sock, full_path)
+            if need_distribute == '1':
+                # Important to decide whether to close socket right now or after distribution.
+                # Performance or consistency?
+                CommandHandler.distribute(full_path)
         elif code == Codes.download_all:
-            pass
+            CommandHandler.handle_download_all(self.sock)
         else:
             print("ClientListener: no command correspond to code", code)
-
-        # TODO if doesn't work change to shutdown()
-        self.sock.close()
+        # regarding shutdown:
+        # Shut down one or both halves of the connection.
+        # If how is SHUT_RD,   further receives are disallowed.
+        # If how is SHUT_WR,   further sends are disallowed.
+        # If how is SHUT_RDWR, further sends and receives are disallowed.
+        self.sock.shutdown(1)
 
 
 def get_sync_storage_ip():
     sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     sock.connect((Constants.NAMENODE_IP, Constants.NEW_NODES_PORT))
     to_sync = sock.recv(1024).decode('utf-8')
-    sock.close()
+    sock.shutdown(1)
     return to_sync
 
 
+def notify_i_clear():
+    sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    sock.connect((Constants.NAMENODE_IP, Constants.NEW_NODES_PORT))
+    sock.send(str(Codes.i_clear).encode('utf-8'))
+    sock.shutdown(1)
+
+
 def init_sync():
+    # First we delete everything we have
+    # because we don't resurrect old nodes.
+    os.removedirs(Constants.STORAGE_PATH)
+    # then create this dir empty
+    os.makedirs(Constants.STORAGE_PATH)
     storage_ip = get_sync_storage_ip()
     sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    # connect and ask for all files
     sock.connect((storage_ip, Constants.STORAGE_PORT))
-    # TODO: gather all files from another storage
+    sock.send(str(Codes.download_all).encode('utf-8'))
 
-    # TODO: Also notify namenode that this node is clear now
+    # From this point we are going to receive a lot mkdir, and upload requests
+    # from another storage and in this socket we are just waiting
+    # When we receive ack then we are consistent with storage with 'storage_ip'
+    sock.recv(1024)
+    # Notify we are clear
+    notify_i_clear()
+
+    sock.shutdown(1)
 
 
 def main():
-    init_sync()
-
     sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     sock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
     sock.bind(('', Constants.STORAGE_PORT))
     sock.listen()
+    init_sync()
     while True:
         sck, addr = sock.accept()
         print("Accepted address:", addr)
-        if addr == Constants.NAMENODE_IP:
+        if addr[0] == Constants.NAMENODE_IP:
             print("This is Namenode connection")
             NamenodeListener(sck).start()
         else:
-            print("This is Client connection")
+            print("This is Client(or Storage) connection")
             ClientListener(sck).start()
 
 
