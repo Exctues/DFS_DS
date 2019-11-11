@@ -46,7 +46,7 @@ class NamenodeListener(Thread):
         else:
             print("NamenodeListener: no command correspond to code", code)
 
-        self.sock.shutdown(1)
+        self.sock.close()
 
 
 class ClientListener(Thread):
@@ -79,7 +79,7 @@ class ClientListener(Thread):
         # If how is SHUT_RD,   further receives are disallowed.
         # If how is SHUT_WR,   further sends are disallowed.
         # If how is SHUT_RDWR, further sends and receives are disallowed.
-        self.sock.shutdown(1)
+        self.sock.close()
 
 
 @logger.log
@@ -123,9 +123,10 @@ def init_sync():
     # Notify we are clear
     notify_i_clear()
 
-    sock.shutdown(1)
+    sock.close()
 
 
+@logger.log
 def main():
     sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     sock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
@@ -133,6 +134,7 @@ def main():
     sock.listen()
     init_sync()
     while True:
+        logger.print_debug_info()
         sck, addr = sock.accept()
         if addr[0] == Constants.NAMENODE_IP:
             logger.print_debug_info("This is Namenode connection", addr)

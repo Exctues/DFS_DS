@@ -70,7 +70,7 @@ class CommandHandler:
                 CommandHandler.handle_print_to(sock, full_path)
             else:
                 sock.send(full_path)
-            sock.shutdown(1)
+            sock.close()
 
         # for all files
         for dir_name, subdir_list, file_list in os.walk(Constants.STORAGE_PATH):
@@ -101,7 +101,7 @@ class CommandHandler:
                 sock.send(full_path.encode('utf-8'))
                 sock.recv(1024)
                 CommandHandler.handle_print_to(sock, full_path)
-            sock.shutdown(1)
+            sock.close()
 
     @staticmethod
     @logger.log
@@ -125,7 +125,7 @@ class CommandHandler:
         sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         sock.connect((Constants.NAMENODE_IP, Constants.NEW_NODES_PORT))
         ips = sock.recv(1024).decode('utf-8').strip().split(" ")
-        sock.shutdown(1)
+        sock.close()
         return ips
 
     @staticmethod
