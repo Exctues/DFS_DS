@@ -8,6 +8,7 @@ from namenode.tree import FSTree
 from constants import Constants
 from codes import Codes
 from threading import Thread, Lock
+import logger
 
 
 class Nodes:
@@ -20,7 +21,7 @@ class Nodes:
 clean_nodes = Nodes()
 dirty_nodes = Nodes()
 
-
+@logger.log
 def send_args(ip, port, cmd, arg1='', arg2=''):
     sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     sock.connect((ip, port))
@@ -37,7 +38,7 @@ def send_args(ip, port, cmd, arg1='', arg2=''):
 
     sock.shutdown(0)
 
-
+@logger.log
 def multicast(cmd, arg1='', arg2=''):
     """
     threaded multicast to all storage servers
@@ -55,12 +56,13 @@ def multicast(cmd, arg1='', arg2=''):
         thread = Thread(target=send_args, args=[ip, Constants.STORAGE_PORT, cmd, arg1, arg2])
         thread.start()
 
-
+@logger.log
 def random_ip():
     return random.sample(clean_nodes.nodes, 1).encode('utf-8')
 
 
 # thread that pings nodes and modify storage_nodes
+@logger.log
 def ping():
     def ping_thread():
         while True:
@@ -76,6 +78,7 @@ def ping():
 
 
 # thread that listens and add new storage nodes
+@logger.log
 def new_nodes_listener():
     def new_nodes_listener_thread():
         soc = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
