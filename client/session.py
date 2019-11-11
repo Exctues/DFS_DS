@@ -86,6 +86,8 @@ class Session:
         with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as sock:
             sock.connect((Constants.NAMENODE_IP, Constants.CLIENT_TO_NAMENODE))
             sock.send(str(Codes.validate_path).encode('utf-8'))
+            sock.recv(1024)
+            sock.send(path)
             is_valid = (sock.recv(1024).decode('utf-8'))
             logger.print_debug_info("RECEIVED", is_valid)
             try:
