@@ -24,11 +24,12 @@ class Colors:
 
 
 def handle_error(message):
-    if parameters.interactive:
-        print(Colors.colored(message, Colors.FAIL, Colors.BOLD))
-    else:
-        raise Exception(message)
+    print(Colors.colored(message, Colors.FAIL, Colors.BOLD))
 
 
 def print_info(message):
     print(Colors.colored(message, Colors.OKBLUE, Colors.BOLD))
+
+
+def print_debug_info(message):
+    print(Colors.colored(message, Colors.OKGREEN))

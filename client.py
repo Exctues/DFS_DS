@@ -1,6 +1,7 @@
 from client.commands import *
-from client.utils import *
 from client.session import Session
+import parameters
+import logger
 
 import argparse
 import sys
@@ -21,11 +22,11 @@ class CommandAction(argparse.Action):
 
         command = getattr(Commands, values[0], None)
         if not command:
-            handle_error(Messages.wrong_command_message(values[0]))
+            logger.handle_error(Messages.wrong_command_message(values[0]))
             return
 
         if not command.validate_nargs(len(values) - 1):
-            handle_error(Messages.wrong_argnumber_message(command))
+            logger.handle_error(Messages.wrong_argnumber_message(command))
             return
 
         command(self.__session, values[1:])
@@ -50,8 +51,8 @@ def interactive_loop(parser: argparse.ArgumentParser):
 
 
 def main():
-    if Parameters.disable_color:
-        Colors.disable()
+    if parameters.disable_color:
+        logger.Colors.disable()
 
     parser = setup_argparse()
 
