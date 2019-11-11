@@ -1,6 +1,7 @@
-from client.utils import *
 from constants import Constants
 from codes import Codes
+import parameters
+import logger
 
 import os
 import socket
@@ -12,7 +13,7 @@ class Session:
         self.interactive = interactive
 
     def print_curr_dir(self, *args):
-        print(Colors.colored(self.get_curr_dir(), Colors.OKBLUE, Colors.BOLD))
+        logger.print_info(self.get_curr_dir())
 
     def get_curr_dir(self):
         return self.__wd
@@ -32,17 +33,17 @@ class Session:
                             None, is the path could not be found
         """
         res = self.__build_path(path)
-        path = res.split(Parameters.sep)
+        path = res.split(parameters.sep)
         part_path = path[:-new_length]
         new_path = path[-new_length:]
-        part_path = Parameters.sep + Parameters.sep.join(part_path)
-        part_path = self.validate_path(part_path).strip(Parameters.sep)
+        part_path = parameters.sep + parameters.sep.join(part_path)
+        part_path = self.validate_path(part_path).strip(parameters.sep)
 
         if part_path is None:
             return None
 
-        res = f"{Parameters.sep}{Parameters.sep.join(part_path)}" \
-              f"{Parameters.sep}{Parameters.sep.join(new_path)}"
+        res = f"{parameters.sep}{parameters.sep.join(part_path)}" \
+              f"{parameters.sep}{parameters.sep.join(new_path)}"
 
         return res
 
@@ -54,13 +55,13 @@ class Session:
     def __build_path(self, path):
         path = path.strip('"')
 
-        if path[0] == Parameters.sep:
+        if path[0] == parameters.sep:
             res = path
         else:
-            curr_dir = self.get_curr_dir().strip(Parameters.sep)
+            curr_dir = self.get_curr_dir().strip(parameters.sep)
 
-            res = f"{Parameters.sep}{curr_dir}" \
-                  f"{Parameters.sep}{path.strip(Parameters.sep)}"
+            res = f"{parameters.sep}{curr_dir}" \
+                  f"{parameters.sep}{path.strip(parameters.sep)}"
 
         return res
 
@@ -73,7 +74,7 @@ class Session:
                 sock.send('ok'.encode('utf-8'))
                 true_path = sock.recv(1024).decode('utf-8')
             else:
-                handle_error("Path {} is invalid!".format(path))
+                logger.handle_error("Path {} is invalid!".format(path))
                 true_path = None
 
         return true_path
@@ -85,7 +86,7 @@ class Session:
         # ack
         sock.send('ok'.encode('utf-8'))
         size = sock.recv(1024).decode('utf-8')
-        print_response("{}\t{} bytes".format(filename, size))
+        logger.print_info("{}\t{} bytes".format(filename, size))
 
         sock.shutdown(0)
 
@@ -93,15 +94,15 @@ class Session:
     def handle_ls(command, args):
         sock = Session.send_command(command, args, close_socket=False)
         l = sock.recv(1024).decode('utf-8')
-        l = l.split(Parameters.path_sep)
-        print_response('\n'.join(l))
+        l = l.split(parameters.path_sep)
+        logger.print_info('\n'.join(l))
         sock.shutdown(0)
 
     @staticmethod
     def handle_upload(command, args):
         assert len(args) == 2
         if not os.path.isfile(args[0]):
-            handle_error("Incorrect host path specified!")
+            logger.handle_error("Incorrect host path specified!")
             return
 
         with open(args[0], 'rb') as host_file:

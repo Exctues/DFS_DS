@@ -30,5 +30,5 @@ def handle_error(message):
         raise Exception(message)
 
 
-def print_response(message):
+def print_info(message):
     print(Colors.colored(message, Colors.OKBLUE, Colors.BOLD))
