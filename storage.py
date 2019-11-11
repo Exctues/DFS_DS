@@ -38,6 +38,11 @@ class NamenodeListener(Thread):
         elif code == Codes.rmdir:
             full_path = self.sock.recv(1024).decode('utf-8')
             CommandHandler.handle_rmdir(full_path)
+        elif code == Codes.init:
+            if os.path.exists(Constants.STORAGE_PATH):
+                os.removedirs(Constants.STORAGE_PATH)
+            # then create this dir empty
+            os.makedirs(Constants.STORAGE_PATH)
         else:
             print("NamenodeListener: no command correspond to code", code)
 
@@ -126,7 +131,7 @@ def main():
     sock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
     sock.bind(('', Constants.STORAGE_PORT))
     sock.listen()
-    # init_sync()
+    init_sync()
     while True:
         sck, addr = sock.accept()
         if addr[0] == Constants.NAMENODE_IP:
