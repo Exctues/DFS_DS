@@ -1,4 +1,5 @@
 FROM python:latest
-RUN sudo apt-get install
+RUN sudo apt-get update && sudo apt-get install git
+RUN git clone ``
 EXPOSE 1337 322
 ENTRYPOINT ["python", "/src/namenode.py"]

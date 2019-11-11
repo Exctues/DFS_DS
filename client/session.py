@@ -97,7 +97,8 @@ class Session:
         size = sock.recv(1024).decode('utf-8')
         logger.print_info("{}\t{} bytes".format(filename, size))
 
-        sock.shutdown(0)
+        # sock.shutdown(0)
+        sock.close()
 
     @staticmethod
     @logger.log
@@ -106,7 +107,8 @@ class Session:
         l = sock.recv(1024).decode('utf-8')
         l = l.split(parameters.path_sep)
         logger.print_info('\n'.join(l))
-        sock.shutdown(0)
+        # sock.shutdown(0)
+        sock.close()
 
     @staticmethod
     @logger.log
@@ -121,7 +123,8 @@ class Session:
 
             sock = Session.send_command(command, (args[1], size), close_socket=False)
             ip = sock.recv(1024).decode('utf-8')
-            sock.shutdown(0)
+            # sock.shutdown(0)
+            sock.close()
 
             with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as sock:
                 sock.connect((ip, Constants.STORAGE_PORT))
@@ -135,12 +138,15 @@ class Session:
                     sock.recv(1)
                     data = host_file.read(1024)
 
+                sock.close()
+
     @staticmethod
     @logger.log
     def handle_print(command, source):
         sock = Session.send_command(command, (source,), close_socket=False)
         ip = sock.recv(1024).decode('utf-8')
-        sock.shutdown(0)
+        # sock.shutdown(0)
+        sock.close()
 
         with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as sock:
             sock.connect((ip, Constants.STORAGE_PORT))
@@ -172,7 +178,8 @@ class Session:
             logger.print_debug_info("Sent arg", arg)
 
         if close_socket:
-            sock.shutdown(0)
+            # sock.shutdown(0)
+            sock.close()
             return True
 
         return sock
