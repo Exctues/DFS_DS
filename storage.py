@@ -99,10 +99,13 @@ def notify_i_clear():
 def init_sync():
     # First we delete everything we have
     # because we don't resurrect old nodes.
-    os.removedirs(Constants.STORAGE_PATH)
+    if os.path.exists(Constants.STORAGE_PATH):
+        os.removedirs(Constants.STORAGE_PATH)
     # then create this dir empty
     os.makedirs(Constants.STORAGE_PATH)
     storage_ip = get_sync_storage_ip()
+    if storage_ip == '-1':
+        return
     sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     # connect and ask for all files
     sock.connect((storage_ip, Constants.STORAGE_PORT))
@@ -123,7 +126,7 @@ def main():
     sock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
     sock.bind(('', Constants.STORAGE_PORT))
     sock.listen()
-    init_sync()
+    # init_sync()
     while True:
         sck, addr = sock.accept()
         if addr[0] == Constants.NAMENODE_IP:

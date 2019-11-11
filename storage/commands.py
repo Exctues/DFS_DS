@@ -89,6 +89,9 @@ class CommandHandler:
         # ask namenode for all storage's ips
         storages_ip = CommandHandler._get_all_storages_ip()
         # send file to everybody
+        if storages_ip == '-1':
+            return
+
         for ip in storages_ip:
             sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
             sock.connect((ip, Constants.STORAGE_PORT))
