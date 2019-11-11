@@ -4,7 +4,6 @@ import random
 import time
 import socket
 import sys
-# from namenode.handlers import Handlers
 from namenode.tree import FSTree
 from constants import Constants
 from codes import Codes
@@ -117,38 +116,38 @@ while True:
     soc.bind(('', Constants.CLIENT_TO_NAMENODE))
     soc.listen()
     while True:
-        con, addr = soc.accept()  # addr is a tuple
+        con, addr = soc.accept() # addr is a tuple
 
         code = int(con.recv(1024).decode('utf-8'))
         con.send('ok'.encode('utf-8'))
 
-        if code == Codes.init:  # init
+        if code == Codes.init: # init
             del tree
             tree = FSTree()
             multicast(Codes.init)
 
-        elif code == Codes.make_file:  # make_file (not dir)
+        elif code == Codes.make_file: # make_file (not dir)
             filepath = con.recv(1024).decode('utf-8')
             tree.insert(filepath, 0)
             multicast(Codes.make_file, filepath)
 
-        elif code == Codes.print:  # print # download
+        elif code == Codes.print: # print # download
             source = con.recv(1024).decode('utf-8')
             con.send(random_ip().encode('utf-8'))
 
-        elif code == Codes.upload:  # upload
+        elif code == Codes.upload: # upload
             filename = con.recv(1024).decode('utf-8')
             con.send('ok'.encode('utf-8'))
             size = int(con.recv(1024).decode('utf-8'))
             tree.insert(filename, size)
             con.send(random_ip().encode('utf-8'))
 
-        elif code == Codes.rm:  # rm
+        elif code == Codes.rm: # rm
             filename = con.recv(1024).decode('utf-8')
             tree.remove(filename)
             multicast(Codes.rm, filename)
 
-        elif code == Codes.info:  # info
+        elif code == Codes.info: # info
             filename = con.recv(1024).decode('utf-8')
             node = tree.find_node(filename)
             con.send(node.name.encode('utf-8'))
@@ -156,14 +155,14 @@ while True:
             a = con.recv(1024).decode('utf-8')
             con.send(str(node.size).encode('utf-8'))
 
-        elif code == Codes.copy:  # copy
+        elif code == Codes.copy: # copy
             source = con.recv(1024).decode('utf-8')
             con.send('ok'.encode('utf-8'))
             destination = con.recv(1024).decode('utf-8')
             tree.insert(destination)
             multicast(Codes.copy, source, destination)
 
-        elif code == Codes.move:  # move
+        elif code == Codes.move: # move
             source = con.recv(1024).decode('utf-8')
             con.send('ok'.encode('utf-8'))
             destination = con.recv(1024).decode('utf-8')
@@ -171,23 +170,23 @@ while True:
             tree.insert(destination)
             multicast(Codes.move, source, destination)
 
-        elif code == Codes.ls:  # ls
+        elif code == Codes.ls: # ls
             source = con.recv(1024).decode('utf-8')
             children = tree.find_node(source).get_children()
             child_str = ';'.join(children)
             con.send(child_str.encode('utf-8'))
 
-        elif code == Codes.make_dir:  # make_dir
+        elif code == Codes.make_dir: # make_dir
             filepath = con.recv(1024).decode('utf-8')
             tree.insert(filepath)
             multicast(Codes.make_dir, filepath)
 
-        elif code == Codes.rmdir:  # rmdir
+        elif code == Codes.rmdir: # rmdir
             filepath = con.recv(1024).decode('utf-8')
             tree.remove(filepath)
             multicast(Codes.rmdir, filepath)
 
-        elif code == Codes.validate_path:
+        elif code == Codes.validate_path: # validate_path
             filepath = con.recv(1024).decode('utf-8')
             path = tree.find_node(filepath)
             if path is not None:
