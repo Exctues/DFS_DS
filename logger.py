@@ -36,7 +36,8 @@ def print_info(*args, sep=' ', end='\n'):
 
 
 def print_debug_info(*args, sep=' ', end='\n'):
-    print(Colors.colored(sep.join(args) + end, Colors.OKGREEN), end='')
+    if parameters.verbose:
+        print(Colors.colored(sep.join(args) + end, Colors.OKGREEN), end='')
 
 
 def log(func):
