@@ -58,7 +58,7 @@ def multicast(cmd, arg1='', arg2=''):
 
 @logger.log
 def random_ip():
-    return random.sample(clean_nodes.nodes, 1).encode('utf-8')
+    return random.sample(clean_nodes.nodes, 1)[0]
 
 # thread that pings nodes and modify storage_nodes
 @logger.log
