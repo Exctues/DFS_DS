@@ -82,7 +82,14 @@ class Session:
         with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as sock:
             sock.connect((Constants.NAMENODE_IP, Constants.CLIENT_TO_NAMENODE))
             sock.send(str(Codes.validate_path).encode('utf-8'))
-            is_valid = int(sock.recv(1024).decode('utf-8'))
+            is_valid = (sock.recv(1024).decode('utf-8'))
+            logger.print_debug_info("RECEIVED", is_valid)
+            try:
+                is_valid = int(is_valid)
+            except:
+                logger.print_debug_info()
+                return False
+
             if is_valid:
                 logger.print_debug_info("Valid")
                 sock.send('ok'.encode('utf-8'))
