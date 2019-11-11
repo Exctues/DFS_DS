@@ -31,5 +31,17 @@ def print_info(message):
     print(Colors.colored(message, Colors.OKBLUE, Colors.BOLD))
 
 
-def print_debug_info(message):
-    print(Colors.colored(message, Colors.OKGREEN))
+def print_debug_info(*message):
+    print(Colors.colored(" ".join(message), Colors.OKGREEN))
+
+
+def log(func):
+    def wrapper(*args, **kwargs):
+        func_str = func.__name__
+        args_str = ', '.join(args)
+        # kwargs_str = ', '.join([':'.join([str(j) for j in i]) for i in kwargs.iteritems()])
+        print("Function:", func_str, "args:", args_str)
+        # print(kwargs_str)
+        return func(*args, **kwargs)
+
+    return wrapper

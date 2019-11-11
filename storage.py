@@ -4,6 +4,7 @@ from threading import Thread
 from codes import Codes
 from storage.commands import CommandHandler
 from constants import Constants
+import logger
 
 
 class NamenodeListener(Thread):
@@ -44,15 +45,13 @@ class NamenodeListener(Thread):
 
 
 class ClientListener(Thread):
-    def __init__(self, sock: socket.socket):
+    def __init__(self, sock: socket.socket, address: tuple):
         super().__init__(daemon=True)
         self.sock = sock
-
-    def _close(self):
-        self.sock.close()
+        self.address = address
 
     def run(self):
-        code = self.sock.recv(4).decode('utf-8')
+        code = self.sock.recv(1024).decode('utf-8')
         self.sock.send('ok'.encode('utf-8'))
 
         if code == Codes.print:
@@ -64,10 +63,10 @@ class ClientListener(Thread):
             CommandHandler.handle_upload_from(self.sock, full_path)
             if need_distribute == '1':
                 # Important to decide whether to close socket right now or after distribution.
-                # Performance or consistency?
+                # Performance or consistency? Consistency!
                 CommandHandler.distribute(full_path)
         elif code == Codes.download_all:
-            CommandHandler.handle_download_all(self.sock)
+            CommandHandler.handle_download_all(self.address)
         else:
             print("ClientListener: no command correspond to code", code)
         # regarding shutdown:
@@ -78,14 +77,17 @@ class ClientListener(Thread):
         self.sock.shutdown(1)
 
 
+@logger.log
 def get_sync_storage_ip():
     sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     sock.connect((Constants.NAMENODE_IP, Constants.NEW_NODES_PORT))
+    sock.send(str(Codes.init_new_storage).encode('utf-8'))
     to_sync = sock.recv(1024).decode('utf-8')
     sock.shutdown(1)
     return to_sync
 
 
+@logger.log
 def notify_i_clear():
     sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     sock.connect((Constants.NAMENODE_IP, Constants.NEW_NODES_PORT))
@@ -93,6 +95,7 @@ def notify_i_clear():
     sock.shutdown(1)
 
 
+@logger.log
 def init_sync():
     # First we delete everything we have
     # because we don't resurrect old nodes.
@@ -123,13 +126,12 @@ def main():
     init_sync()
     while True:
         sck, addr = sock.accept()
-        print("Accepted address:", addr)
         if addr[0] == Constants.NAMENODE_IP:
-            print("This is Namenode connection")
+            logger.print_debug_info("This is Namenode connection", addr)
             NamenodeListener(sck).start()
         else:
-            print("This is Client(or Storage) connection")
-            ClientListener(sck).start()
+            logger.print_debug_info("This is Client(or Storage) connection", addr)
+            ClientListener(sck, addr).start()
 
 
 if __name__ == '__main__':

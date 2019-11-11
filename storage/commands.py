@@ -3,26 +3,31 @@ import shutil
 import socket
 from constants import Constants
 from codes import Codes
+import logger
 
 
 # full_path is expected to start with '/', not '/var/dfs_storage/
 # real_path is '/var/dfs_storage/...'
 class CommandHandler:
     @staticmethod
+    @logger.log
     def handle_copy(source, destination):
         shutil.copy(os.path.join(Constants.STORAGE_PATH, source),
                     os.path.join(Constants.STORAGE_PATH, destination))
 
     @staticmethod
+    @logger.log
     def handle_move(source, destination):
         shutil.move(os.path.join(Constants.STORAGE_PATH, source),
                     os.path.join(Constants.STORAGE_PATH, destination))
 
     @staticmethod
+    @logger.log
     def handle_rm(full_path):
         os.remove(os.path.join(Constants.STORAGE_PATH, full_path))
 
     @staticmethod
+    @logger.log
     def handle_upload_from(socket: socket.socket, full_path):
         # receiving file from a client
         with open(os.path.join(Constants.STORAGE_PATH, full_path), 'wb+') as file:
@@ -35,6 +40,7 @@ class CommandHandler:
                     return
 
     @staticmethod
+    @logger.log
     def handle_print_to(socket: socket.socket, full_path):
         # sending file to a client
         with open(os.path.join(Constants.STORAGE_PATH, full_path), 'rb') as file:
@@ -45,6 +51,7 @@ class CommandHandler:
                 data = file.read(1024)
 
     @staticmethod
+    @logger.log
     def handle_download_all(address: tuple):
         """address is (host, port) tuple
            We do separate request for each make_dir & upload request
@@ -75,6 +82,7 @@ class CommandHandler:
                 ask(Codes.upload, full_path)
 
     @staticmethod
+    @logger.log
     def distribute(full_path: str):
         """Distributing a file which we just uploaded from a client"""
         # real_path = os.path.join(Constants.STORAGE_PATH, full_path)
@@ -93,19 +101,23 @@ class CommandHandler:
             sock.shutdown(1)
 
     @staticmethod
+    @logger.log
     def handle_mkdir(full_path):
         os.makedirs(os.path.join(Constants.STORAGE_PATH, full_path), exist_ok=True)
 
     @staticmethod
+    @logger.log
     def handle_make_file(full_path):
         with open(os.path.join(Constants.STORAGE_PATH, full_path), "wb+"):
             return
 
     @staticmethod
+    @logger.log
     def handle_rmdir(full_path):
         os.rmdir(full_path)
 
     @staticmethod
+    @logger.log
     def _get_all_storages_ip():
         sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         sock.connect((Constants.NAMENODE_IP, Constants.NEW_NODES_PORT))
