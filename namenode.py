@@ -21,6 +21,7 @@ class Nodes:
 clean_nodes = Nodes()
 dirty_nodes = Nodes()
 
+@logger.log
 def send_args(ip, port, cmd, arg1='', arg2=''):
     sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     sock.connect((ip, port))
@@ -37,6 +38,7 @@ def send_args(ip, port, cmd, arg1='', arg2=''):
 
     sock.shutdown(0)
 
+@logger.log
 def multicast(cmd, arg1='', arg2=''):
     """
     threaded multicast to all storage servers
@@ -54,12 +56,13 @@ def multicast(cmd, arg1='', arg2=''):
         thread = Thread(target=send_args, args=[ip, Constants.STORAGE_PORT, cmd, arg1, arg2])
         thread.start()
 
+@logger.log
 def random_ip():
     return random.sample(clean_nodes.nodes, 1).encode('utf-8')
 
 # thread that pings nodes and modify storage_nodes
+@logger.log
 def ping():
-    print('run ping')
     def ping_thread():
         while True:
             for ip in clean_nodes.nodes.copy():
@@ -73,7 +76,7 @@ def ping():
     heartbeat.start()
 
 # thread that listens and add new storage nodes
-
+@logger.log
 def new_nodes_listener():
     def new_nodes_listener_thread():
         soc = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -86,7 +89,7 @@ def new_nodes_listener():
             # i_clear = 15
 
             con, addr = soc.accept()
-            print('new connection')
+            print('new storage node connection')
             code = int(con.recv(1024).decode('utf-8'))
 
             if code == Codes.i_clear:
@@ -125,7 +128,7 @@ while True:
     soc.listen()
     while True:
         con, addr = soc.accept() # addr is a tuple
-
+        print('new client connection')
         code = int(con.recv(1024).decode('utf-8'))
         con.send('ok'.encode('utf-8'))
 
