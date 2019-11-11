@@ -1,3 +1,6 @@
+import parameters
+
+
 class Colors:
     OKBLUE = '\033[94m'
     OKGREEN = '\033[92m'
@@ -21,18 +24,11 @@ class Colors:
 
 
 def handle_error(message):
-    if Parameters.interactive:
+    if parameters.interactive:
         print(Colors.colored(message, Colors.FAIL, Colors.BOLD))
     else:
         raise Exception(message)
 
 
-def print_response(message):
+def print_info(message):
     print(Colors.colored(message, Colors.OKBLUE, Colors.BOLD))
-
-
-class Parameters:
-    disable_color = False
-    sep = '/'
-    path_sep = ';'
-    interactive = True
