@@ -26,7 +26,7 @@ def send_args(ip, port, cmd, arg1='', arg2=''):
     sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     sock.connect((ip, port))
 
-    sock.send(cmd.encode('utf-8'))
+    sock.send(str(cmd).encode('utf-8'))
     if arg1 != '':
         # acknowledge
         sock.recv(1024)
@@ -60,7 +60,6 @@ def multicast(cmd, arg1='', arg2=''):
 def random_ip():
     return random.sample(clean_nodes.nodes, 1).encode('utf-8')
 
-
 # thread that pings nodes and modify storage_nodes
 @logger.log
 def ping():
@@ -76,7 +75,6 @@ def ping():
     heartbeat = Thread(target=ping_thread)
     heartbeat.start()
 
-
 # thread that listens and add new storage nodes
 @logger.log
 def new_nodes_listener():
@@ -91,7 +89,7 @@ def new_nodes_listener():
             # i_clear = 15
 
             con, addr = soc.accept()
-            print('new connection')
+            print('new storage node connection')
             code = int(con.recv(1024).decode('utf-8'))
 
             if code == Codes.i_clear:
@@ -117,6 +115,8 @@ def new_nodes_listener():
     new_nodes_listener = Thread(target=new_nodes_listener_thread)
     new_nodes_listener.start()
 
+ping()
+new_nodes_listener()
 
 tree = FSTree()
 
@@ -128,7 +128,7 @@ while True:
     soc.listen()
     while True:
         con, addr = soc.accept() # addr is a tuple
-
+        print('new client connection')
         code = int(con.recv(1024).decode('utf-8'))
         con.send('ok'.encode('utf-8'))
 

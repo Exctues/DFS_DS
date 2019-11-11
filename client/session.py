@@ -162,11 +162,14 @@ class Session:
 
         sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         sock.connect((Constants.NAMENODE_IP, Constants.CLIENT_TO_NAMENODE))
-        sock.send(command.code.encode('utf-8'))
+        sock.send(str(command.code).encode('utf-8'))
+        logger.print_debug_info("Sent command", command.name)
 
         for arg in args:
             sock.recv(1024)
+            logger.print_debug_info("Received ack")
             sock.send(arg.encode('utf-8'))
+            logger.print_debug_info("Sent arg", arg)
 
         if close_socket:
             sock.shutdown(0)

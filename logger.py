@@ -23,20 +23,19 @@ class Colors:
         Colors.UNDERLINE = ''
 
 
-def __build_print_message(*args, sep=' ', end = '\n'):
-    return sep.join(args) + end
-
-
 def handle_error(*args, sep=' ', end='\n'):
     print(Colors.colored(sep.join(args) + end, Colors.FAIL, Colors.BOLD))
 
 
 def print_info(*args, sep=' ', end='\n'):
-    print(Colors.colored(sep.join(args) + end, Colors.OKBLUE, Colors.BOLD), end='')
+    to_print = sep.join(str(arg) for arg in args) + end
+    print(Colors.colored(to_print, Colors.OKBLUE, Colors.BOLD), end='')
 
 
 def print_debug_info(*args, sep=' ', end='\n'):
-    print(Colors.colored(sep.join(args) + end, Colors.OKGREEN), end='')
+    to_print = sep.join(str(arg) for arg in args) + end
+    if parameters.verbose:
+        print(Colors.colored(to_print, Colors.OKGREEN), end='')
 
 
 def log(func):

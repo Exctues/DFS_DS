@@ -1,0 +1,4 @@
+FROM python:latest
+RUN sudo apt-get install
+EXPOSE 1337 322
+ENTRYPOINT ["python", "/src/namenode.py"]
