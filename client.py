@@ -55,7 +55,9 @@ def interactive_loop(parser: argparse.ArgumentParser):
 def main():
     try:
         import socket
-        socket.create_connection((Constants.NAMENODE_IP, Constants.CLIENT_TO_NAMENODE))
+        sock = socket.create_connection((Constants.NAMENODE_IP, Constants.CLIENT_TO_NAMENODE))
+        sock.send('-100'.encode('utf-8'))
+        sock.shutdown(0)
     except:
         logger.handle_error("Could not reach namenode server. Try again later.")
         exit(-1)
