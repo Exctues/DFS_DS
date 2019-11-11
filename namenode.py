@@ -36,7 +36,7 @@ def send_args(ip, port, cmd, arg1='', arg2=''):
         sock.recv(1024)
         sock.send(arg2.encode('utf-8'))
 
-    sock.shutdown(0)
+    sock.close()
 
 @logger.log
 def multicast(cmd, arg1='', arg2=''):
@@ -110,7 +110,7 @@ def new_nodes_listener():
                 else:
                     con.send('-1'.encode('utf-8'))
 
-            con.shutdown(0)
+            con.close()
 
     new_nodes_listener = Thread(target=new_nodes_listener_thread)
     new_nodes_listener.start()
@@ -207,4 +207,4 @@ while True:
                 con.send(path.get_path().encode('utf-8'))
             else:
                 con.send(str(0).encode('utf-8'))
-        con.shutdown(0)
+        con.close()
