@@ -38,20 +38,23 @@ class Session:
         logger.print_debug_info("built partial path:", res)
         path = res.split(parameters.sep)
         path = list(filter(lambda path: path != '', path))
-        # if len(path) <= 1:
-            # return path
+
+        if len(path) <= 1:
+            return parameters.sep + parameters.sep.join(path)
+
         part_path = path[:-new_length]
         new_path = path[-new_length:]
+
         part_path = parameters.sep + parameters.sep.join(part_path)
         part_path = self.validate_path(part_path)
-        logger.print_debug_info("Received from validate_path:", part_path)
+
         if part_path:
             part_path = part_path.strip(parameters.sep)
         else:
             logger.handle_error("Path is not valid")
             return None
 
-        res = "{}{}{}{}".format(parameters.sep, parameters.sep.join(part_path), parameters.sep, 
+        res = "{}{}{}{}".format(parameters.sep, part_path, parameters.sep, 
                                 parameters.sep.join(new_path))
 
         logger.print_debug_info("{} -> {}".format(parameters.sep + parameters.sep.join(path), res))
@@ -84,7 +87,7 @@ class Session:
     def validate_path(path):
         if not path or path == parameters.sep:
             # root
-            return True
+            return '/'
 
         with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as sock:
             sock.connect((Constants.NAMENODE_IP, Constants.CLIENT_TO_NAMENODE))
