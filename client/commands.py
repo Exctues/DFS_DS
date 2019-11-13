@@ -1,5 +1,6 @@
 from codes import Codes
 import logger
+import parameters
 
 from itertools import repeat
 
@@ -110,9 +111,11 @@ class CommandConfig:
         @staticmethod
         def upload(session, args):
             if len(args) == 1:
-                args.append(args[0])
+                file_name = args[0].split(parameters.sep)[-1]
+                file_path = session.resolve_partial_path(file_name)
 
-            args[1] = session.resolve_partial_path(args[1])
+                args.append(file_path)
+
             if not args[1]:
                 return
 
