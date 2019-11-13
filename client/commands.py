@@ -176,6 +176,7 @@ class CommandConfig:
             args = list(map(session.resolve_partial_path, args))
             if not all(args):
                 return
+            print("XUUUUUUUUUUUI")
             CommandConfig.Actions.__n_args_handler(session.send_command, Commands.make_dir, args)
 
         @staticmethod

@@ -3,4 +3,4 @@ class Constants:
     NEW_NODES_PORT = 1337  # port where new storage nodes knock
     CLIENT_TO_NAMENODE = 322
     NAMENODE_IP = '127.0.0.1'  # gfs1
-    STORAGE_PATH = '/tmp/test'
+    STORAGE_PATH = '/home/dfs_storage'

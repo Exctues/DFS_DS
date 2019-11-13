@@ -47,5 +47,6 @@ def log(func):
         print_debug_info("FUNCTION", func_str, "args:", args_str, "kwargs:", kwargs_str)
         res = func(*args, **kwargs)
         print_debug_info("RES", res, '\n')
+        return res
 
     return wrapper

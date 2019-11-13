@@ -95,6 +95,7 @@ class CommandHandler:
         # send file to everybody
         if storages_ip == '-1':
             return
+        storages_ip = storages_ip.split(";")
 
         for ip in storages_ip:
             sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
