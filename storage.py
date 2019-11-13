@@ -90,7 +90,7 @@ def get_sync_storage_ip():
     sock.connect((Constants.NAMENODE_IP, Constants.NEW_NODES_PORT))
     sock.send(str(Codes.init_new_storage).encode('utf-8'))
     to_sync = sock.recv(1024).decode('utf-8')
-    sock.shutdown(1)
+    sock.close()
     return to_sync
 
 
@@ -99,7 +99,7 @@ def notify_i_clear():
     sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     sock.connect((Constants.NAMENODE_IP, Constants.NEW_NODES_PORT))
     sock.send(str(Codes.i_clear).encode('utf-8'))
-    sock.shutdown(1)
+    sock.close()
 
 
 @logger.log
@@ -108,7 +108,7 @@ def remove_and_create_storage_dirs():
         os.removedirs(Constants.STORAGE_PATH)
         logger.print_debug_info(Constants.STORAGE_PATH, "removed")
         # then create this dir empty
-    os.makedirs(Constants.STORAGE_PATH)
+    os.makedirs(Constants.STORAGE_PATH, exist_ok=True)
     logger.print_debug_info(Constants.STORAGE_PATH, "(re)created")
 
 
@@ -119,6 +119,7 @@ def init_sync():
     remove_and_create_storage_dirs()
 
     storage_ip = get_sync_storage_ip()
+    logger.print_debug_info("storage_ip", storage_ip)
     if storage_ip == '-1':
         return
     sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -144,7 +145,7 @@ def main():
     sock.listen()
     init_sync()
     while True:
-        logger.print_debug_info()
+        logger.print_debug_info("Wait on accept.")
         sck, addr = sock.accept()
         if addr[0] == Constants.NAMENODE_IP:
             logger.print_debug_info("This is Namenode connection", addr)
