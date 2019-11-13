@@ -57,16 +57,12 @@ class Session:
         res = "{}{}{}{}".format(parameters.sep, part_path, parameters.sep, 
                                 parameters.sep.join(new_path))
 
-        logger.print_debug_info("{} -> {}".format(parameters.sep + parameters.sep.join(path), res))
-
         return res
 
     @logger.log
     def resolve_full_path(self, path):
         res = self.__build_path(path)
         res = self.validate_path(res)
-        if parameters.verbose:
-            logger.print_debug_info("{} -> {}".format(path, res))
 
         return res
 
@@ -129,7 +125,7 @@ class Session:
     @staticmethod
     @logger.log
     def handle_ls(command, args):
-        sock = Session.send_command(command, args, close_socket=False)
+        sock = Session.send_command(command, *args, close_socket=False)
         l = sock.recv(1024).decode('utf-8')
         l = l.split(parameters.path_sep)
         logger.print_info('\n'.join(l))
@@ -147,7 +143,7 @@ class Session:
         with open(args[0], 'rb') as host_file:
             size = str(os.path.getsize(args[0]))
 
-            sock = Session.send_command(command, (args[1], size), close_socket=False)
+            sock = Session.send_command(command, args[1], size, close_socket=False)
             ip = sock.recv(1024).decode('utf-8')
             # sock.shutdown(0)
             sock.close()
@@ -171,7 +167,7 @@ class Session:
     @staticmethod
     @logger.log
     def handle_print(command, source):
-        sock = Session.send_command(command, (source,), close_socket=False)
+        sock = Session.send_command(command, source, close_socket=False)
         ip = sock.recv(1024).decode('utf-8')
         # sock.shutdown(0)
         sock.close()
@@ -193,19 +189,15 @@ class Session:
 
     @staticmethod
     @logger.log
-    def send_command(command, args, close_socket=True):
+    def send_command(command, *args, close_socket=True):
         # Send command to the namenode, send arguments and return socket
-        logger.print_debug_info("Send command invoked!")
         sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         sock.connect((Constants.NAMENODE_IP, Constants.CLIENT_TO_NAMENODE))
         sock.send(str(command.code).encode('utf-8'))
-        logger.print_debug_info("Sent command", command.name)
 
         for arg in args:
             sock.recv(1024)
-            logger.print_debug_info("Received ack")
             sock.send(arg.encode('utf-8'))
-            logger.print_debug_info("Sent arg", arg)
 
         if close_socket:
             # sock.shutdown(0)
