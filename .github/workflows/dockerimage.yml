@@ -1,0 +1,19 @@
+name: Docker Image CI
+
+on: 
+  push:
+    branches: 
+      - docker
+
+jobs:
+
+  build:
+
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v1
+    - name: Build docker
+      run: |
+        cd docker
+        docker build -f namenode_dockerfile -p 322:322 -p 1337:1337 -p 22:22 .
