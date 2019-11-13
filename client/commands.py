@@ -105,14 +105,14 @@ class CommandConfig:
             args = map(session.resolve_full_path, args)
             if not all(args):
                 return
-            session.handle_upload(Commands.print, args[0])
+            session.handle_print(Commands.print, args[0])
 
         @staticmethod
         def upload(session, args):
             if len(args) == 1:
                 args.append(args[0])
 
-            args[1] = session.resolve_full_path(args[1])
+            args[1] = session.resolve_partial_path(args[1])
             if not args[1]:
                 return
 

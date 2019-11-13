@@ -181,6 +181,8 @@ class Session:
                     sock.send('1'.encode('utf-8'))
                 else:
                     return
+        
+        logger.print_info(data)
 
     @staticmethod
     @logger.log
