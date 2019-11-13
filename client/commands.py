@@ -88,7 +88,9 @@ class CommandConfig:
     class Actions:
         @staticmethod
         def __n_args_handler(action, command, args):
-            map(action, repeat(command), args)
+            for arg in args:
+                action(command, arg)
+            # map(action, repeat(command), args)
 
         @staticmethod
         def init(session, args):
