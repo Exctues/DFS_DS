@@ -193,6 +193,7 @@ while True:
 
         elif code == Codes.make_dir: # make_dir
             filepath = con.recv(1024).decode('utf-8')
+            logger.print_debug_info(filepath)
             tree.insert(filepath)
             multicast(Codes.make_dir, filepath)
 

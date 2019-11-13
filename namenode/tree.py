@@ -4,6 +4,7 @@ class FSTree:
 
     def insert(self, path, size=-1, ip_address_pool=None):
         path = path.split('/')
+        print(path)
         path = list(filter(lambda path: path != '', path))
         curr = self.__root
 
@@ -16,6 +17,7 @@ class FSTree:
 
         if size < 0:
             # Creating dir
+            print(path)
             child = self.DirNode(path[-1], curr)
         else:
             child = self.FileNode(path[-1], curr, size, ip_address_pool)
@@ -81,8 +83,7 @@ class FSTree:
                 return self.name
 
             res = self.parent.get_path() + '/' + self.name
-            if res[0] == '/' and res[1] == '/':
-                res = res[1:]
+            res = '/' + res.strip('/')
 
             return res
 
