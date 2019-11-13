@@ -51,10 +51,10 @@ class Session:
             logger.handle_error("Path is not valid")
             return None
 
-        res = f"{parameters.sep}{parameters.sep.join(part_path)}" \
-              f"{parameters.sep}{parameters.sep.join(new_path)}"
+        res = "{}{}{}{}".format(parameters.sep, parameters.sep.join(part_path), parameters.sep, 
+                                parameters.sep.join(new_path))
 
-        logger.print_debug_info("{} -> {}".format(parameters.path_sep + parameters.path_sep.join(path), res))
+        logger.print_debug_info("{} -> {}".format(parameters.sep + parameters.sep.join(path), res))
 
         return res
 
@@ -75,14 +75,17 @@ class Session:
         else:
             curr_dir = self.get_curr_dir().strip(parameters.sep)
 
-            res = f"{parameters.sep}{curr_dir}" \
-                  f"{parameters.sep}{path.strip(parameters.sep)}"
-
+            res = "{}{}{}{}".format(parameters.sep, curr_dir, parameters.sep, path.strip(parameters.sep))
+        
         return res
 
     @staticmethod
     @logger.log
     def validate_path(path):
+        if not path or path == parameters.sep:
+            # root
+            return True
+
         with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as sock:
             sock.connect((Constants.NAMENODE_IP, Constants.CLIENT_TO_NAMENODE))
             sock.send(str(Codes.validate_path).encode('utf-8'))
@@ -189,7 +192,7 @@ class Session:
     @logger.log
     def send_command(command, args, close_socket=True):
         # Send command to the namenode, send arguments and return socket
-
+        logger.print_debug_info("Send command invoked!")
         sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         sock.connect((Constants.NAMENODE_IP, Constants.CLIENT_TO_NAMENODE))
         sock.send(str(command.code).encode('utf-8'))

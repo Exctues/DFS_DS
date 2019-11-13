@@ -88,9 +88,7 @@ class CommandConfig:
     class Actions:
         @staticmethod
         def __n_args_handler(action, command, args):
-            for arg in args:
-                action(command, arg)
-            # map(action, repeat(command), args)
+            list(map(action, repeat(command), args))
 
         @staticmethod
         def init(session, args):
@@ -175,7 +173,7 @@ class CommandConfig:
 
         @staticmethod
         def make_dir(session, args):
-            args = map(session.resolve_partial_path, args)
+            args = list(map(session.resolve_partial_path, args))
             if not all(args):
                 return
             CommandConfig.Actions.__n_args_handler(session.send_command, Commands.make_dir, args)

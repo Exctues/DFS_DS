@@ -43,8 +43,9 @@ def log(func):
         func_str = func.__name__
         args_str = ', '.join([str(arg) for arg in args])
         kwargs_str = ', '.join([':'.join([str(j) for j in i]) for i in kwargs.values()])
-        if parameters.verbose:
-            print_debug_info("Function:", func_str, "args:", args_str, "kwargs:", kwargs_str)
-        return func(*args, **kwargs)
+
+        print_debug_info("FUNCTION", func_str, "args:", args_str, "kwargs:", kwargs_str)
+        res = func(*args, **kwargs)
+        print_debug_info("RES", res, '\n')
 
     return wrapper
