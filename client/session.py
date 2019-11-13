@@ -158,6 +158,8 @@ class Session:
                     data = host_file.read(1024)
 
                 sock.close()
+        
+        logger.print_info(data)
 
     @staticmethod
     @logger.log
