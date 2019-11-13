@@ -149,7 +149,7 @@ class CommandConfig:
 
         @staticmethod
         def cd(session, args):
-            args = map(session.resolve_partial_path, args)
+            args = list(map(session.resolve_partial_path, args))
             if not all(args):
                 return
             session.change_curr_dir(args[0])
