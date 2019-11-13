@@ -1,6 +1,6 @@
 class FSTree:
     def __init__(self):
-        self.__root = self.DirNode('/')
+        self.__root = self.__RootNode()
 
     def insert(self, path, size=-1, ip_address_pool=None):
         path = path.split('/')
@@ -26,7 +26,6 @@ class FSTree:
 
         path = path.split('/')
         path = filter(lambda path: path != '', path)
-
         curr = self.__root
 
         for name in path:
@@ -64,7 +63,7 @@ class FSTree:
                 self.print_tree(level + 1, child)
 
     class FSNode:
-        def __init__(self, name, parent=None):
+        def __init__(self, name, parent):
             self.children = []
             self.__name = name.strip('/')
             self.parent = parent
@@ -82,6 +81,9 @@ class FSTree:
                 return self.name
 
             res = self.parent.get_path() + '/' + self.name
+            if res[0] == '/' and res[1] == '/':
+                res = res[1:]
+
             return res
 
         def get_child(self, name):
@@ -112,21 +114,8 @@ class FSTree:
 
     class DirNode(FSNode):
         def __init__(self, name, parent=None):
-            if name == '/' and parent:
-                print("Name cannot be empty!")
-                return
-            elif not parent and name != '/':
-                print("Parent directory is not specified!")
-                return
-
-            if not parent:
-                self.is_root = True
-            else:
-                self.is_root = False
-
             super().__init__(name, parent)
-            if not self.is_root:
-                self.__add_default_dirs()
+            self.__add_default_dirs()
 
         def __add_default_dirs(self):
             two_dots = FSTree.FSNode('..', self)
@@ -154,5 +143,25 @@ class FSTree:
             return self.__size
 
         def __str__(self):
-            return str(self.get_path())+' ('+str(self.size)+' bytes)'
-            # return f"{self.get_path()} ({self.size} bytes)"
+            # return str(self.get_path())+' ('+str(self.size)+' bytes)'
+            return "{} ({} bytes)".format(self.get_path(), self.size)
+
+    class __RootNode(FSNode):
+        def __init__(self):
+            super().__init__('/', None)
+
+        def get_path(self):
+            return '/'
+
+        def __repr__(self):
+            return '/'
+
+        def __str__(self):
+            return '/'
+
+        def erase(self):
+            for child in self.children:
+                child.erase()
+
+            self.children = []
+            return True
