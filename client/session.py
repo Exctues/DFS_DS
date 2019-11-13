@@ -81,6 +81,7 @@ class Session:
         return res
 
     @staticmethod
+    @logger.log
     def validate_path(path):
         with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as sock:
             sock.connect((Constants.NAMENODE_IP, Constants.CLIENT_TO_NAMENODE))
