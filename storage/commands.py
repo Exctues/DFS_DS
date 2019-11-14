@@ -14,7 +14,7 @@ class CommandHandler:
     def handle_copy(source, destination):
         # to properly join
         full_path = full_path.strip(os.sep)
-        
+
         shutil.copy(os.path.join(Constants.STORAGE_PATH, source),
                     os.path.join(Constants.STORAGE_PATH, destination))
 
@@ -30,6 +30,9 @@ class CommandHandler:
     @staticmethod
     @logger.log
     def handle_rm(full_path):
+        # to properly join
+        full_path = full_path.strip(os.sep)
+        
         os.remove(os.path.join(Constants.STORAGE_PATH, full_path))
 
     @staticmethod
