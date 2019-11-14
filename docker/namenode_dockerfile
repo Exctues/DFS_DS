@@ -1,0 +1,20 @@
+FROM alpine:latest AS intermediate
+
+# install git
+RUN apk add git openssh-client
+
+# add credentials on build
+ARG SSH_PRIVATE_KEY
+ADD ${SSH_PRIVATE_KEY} /root/.ssh/id_rsa
+RUN eval "$(ssh-agent -s)" && ssh-add /root/.ssh/id_rsa
+RUN chmod 700 /root/.ssh/id_rsa
+RUN ssh-keyscan github.com >> /root/.ssh/known_hosts
+RUN git clone git@github.com:Exctues/DFS_DS.git /src/dfs
+
+
+FROM python:latest
+COPY --from=intermediate /src/dfs /src/dfs
+EXPOSE 1337 322
+WORKDIR /src/dfs/
+
+CMD python3 namenode.py
