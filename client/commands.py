@@ -134,7 +134,7 @@ class CommandConfig:
             args = list(map(session.resolve_full_path, args))
             if not all(args):
                 return
-            session.send_command(Commands.info, args)
+            session.send_command(Commands.info, *args)
 
         @staticmethod
         def copy(session, args):
