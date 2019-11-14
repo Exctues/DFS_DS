@@ -45,6 +45,8 @@ class CommandConfig:
 
         help = "Print help message"
 
+        exit = "Leave the program"
+
     class Usage:
         init = ""
 
@@ -65,6 +67,8 @@ class CommandConfig:
 
         help = "[<command>]"
 
+        exit = ""
+
     class Validators:
         cd = lambda n: n == 1
         pwd = lambda n: n == 0
@@ -84,6 +88,7 @@ class CommandConfig:
         rmdir = lambda n: n >= 1
 
         help = lambda n: n <= 1
+        exit = lambda n: True
 
     class Actions:
         @staticmethod
@@ -198,6 +203,11 @@ class CommandConfig:
             else:
                 logger.print_info(Messages.help_message())
 
+        @staticmethod
+        def exit(session, args):
+            print("See ya!")
+            exit(0)
+
 
 class _Command:
     def __init__(self, name):
@@ -252,6 +262,7 @@ class Commands:
     make_dir = _Command("make_dir")
     rmdir = _Command("rmdir")
     help = _Command("help")
+    exit = _Command("exit")
 
     @staticmethod
     def list():

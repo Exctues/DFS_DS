@@ -18,9 +18,6 @@ class CommandAction(argparse.Action):
         self.__session = Session()
 
     def __call__(self, parser, namespace, values, option_string=None):
-        if values[0] == "exit":
-            print("See ya!")
-            exit(0)
 
         command = getattr(Commands, values[0], None)
         if not command:
