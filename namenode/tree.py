@@ -1,4 +1,5 @@
-# TODO set
+import logger
+
 
 class FSTree:
     def __init__(self):
@@ -6,7 +7,6 @@ class FSTree:
 
     def insert(self, path, size=-1, ip_address_pool=None):
         path = path.split('/')
-        print(path)
         path = list(filter(lambda path: path != '', path))
         curr = self.__root
 
@@ -17,9 +17,11 @@ class FSTree:
 
             curr = child
 
+        if path[-1] in curr.children.keys():
+            logger.print_debug_info("Item already exists: ignoring")
+
         if size < 0:
             # Creating dir
-            print(path)
             child = self.DirNode(path[-1], curr)
         else:
             child = self.FileNode(path[-1], curr, size, ip_address_pool)
@@ -68,13 +70,13 @@ class FSTree:
 
     class FSNode:
         def __init__(self, name, parent):
-            self.children = []
+            self.children = {}
             self.__name = name.strip('/')
             self.parent = parent
             self.is_dir = True
 
             if parent is not None:
-                parent.children.append(self)
+                parent.children[name] = self
 
         @property
         def name(self):
@@ -90,23 +92,18 @@ class FSTree:
             return res
 
         def get_child(self, name):
-            if name == '.':
-                return self
-            if name == '..':
-                return self.parent
-
-            for child in self.children:
-                if child.name == name:
-                    return child
+            if name in self.children.keys():
+                return self.children[name]
 
             return None
 
         def get_children(self):
-            return [repr(child) for child in self.children]
+            return self.children.keys()
 
         def erase(self):
-            self.parent.children.remove(self)
+            del self.parent.children[self.name]
             del self
+
             return True
 
         def __repr__(self):
@@ -121,11 +118,8 @@ class FSTree:
             self.__add_default_dirs()
 
         def __add_default_dirs(self):
-            two_dots = FSTree.FSNode('..', self)
-            two_dots.children = self.parent.children
-
-            one_dot = FSTree.FSNode('.', self)
-            one_dot.children = self.children
+            self.children['..'] = self.parent
+            self.children['.'] = self
 
     class FileNode(FSNode):
         def __init__(self, name, parent, size, ip_addresses_pool=None):
