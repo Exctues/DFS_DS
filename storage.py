@@ -65,7 +65,7 @@ class ClientListener(Thread):
             full_path = self.sock.recv(1024).decode('utf-8')
             CommandHandler.handle_print_to(self.sock, full_path)
         elif code == Codes.upload:
-            full_path, need_distribute = self.sock.recv(1024).decode('utf-8').split(' ')
+            full_path, need_distribute = self.sock.recv(1024).decode('utf-8').split(';')
             self.sock.send('ok'.encode('utf-8'))
             CommandHandler.handle_upload_from(self.sock, full_path)
             if need_distribute == '1':

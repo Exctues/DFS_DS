@@ -120,7 +120,7 @@ class CommandConfig:
             if not args[1]:
                 return
 
-            session.handle_upload(Commands.upload, *args)
+            session.handle_upload(Commands.upload, args)
 
         @staticmethod
         def rm(session, args):

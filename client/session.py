@@ -140,19 +140,22 @@ class Session:
             logger.handle_error("Incorrect host path specified!")
             return
 
-        with open(args[0], 'rb') as host_file:
-            size = str(os.path.getsize(args[0]))
+        size = str(os.path.getsize(args[0]))
 
-            sock = Session.send_command(command, args[1], size, close_socket=False)
-            ip = sock.recv(1024).decode('utf-8')
-            # sock.shutdown(0)
-            sock.close()
+        sock = Session.send_command(command, args[1], size, close_socket=False)
+        ip = sock.recv(1024).decode('utf-8')
+        # sock.shutdown(0)
+        sock.close()
+
+        with open(args[0], 'rb') as host_file:
 
             with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as sock:
                 sock.connect((ip, Constants.STORAGE_PORT))
-                sock.send(args[1])
+                sock.send(str(command.code).encode('utf-8'))
+                #ack
                 sock.recv(1024)
-                sock.send('1'.encode('utf-8'))
+                sock.send((args[1] + ';1').encode('utf-8'))
+
                 data = host_file.read(1024)
 
                 while data:
