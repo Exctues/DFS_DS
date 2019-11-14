@@ -32,7 +32,7 @@ class CommandHandler:
     def handle_rm(full_path):
         # to properly join
         full_path = full_path.strip(os.sep)
-        
+
         os.remove(os.path.join(Constants.STORAGE_PATH, full_path))
 
     @staticmethod
@@ -140,6 +140,9 @@ class CommandHandler:
     @staticmethod
     @logger.log
     def handle_rmdir(full_path):
+        # to properly join
+        full_path = full_path.strip(os.sep)
+        
         os.rmdir(full_path)
 
     @staticmethod

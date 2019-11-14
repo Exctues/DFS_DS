@@ -124,14 +124,14 @@ class CommandConfig:
 
         @staticmethod
         def rm(session, args):
-            args = map(session.resolve_full_path, args)
+            args = list(map(session.resolve_full_path, args))
             if not all(args):
                 return
             CommandConfig.Actions.__n_args_handler(session.send_command, Commands.rm, args)
 
         @staticmethod
         def info(session, args):
-            args = map(session.resolve_full_path, args)
+            args = list(map(session.resolve_full_path, args))
             if not all(args):
                 return
             session.send_command(Commands.info, args)
@@ -182,7 +182,7 @@ class CommandConfig:
 
         @staticmethod
         def rmdir(session, args):
-            args = map(session.resolve_full_path, args)
+            args = list(map(session.resolve_full_path, args))
             if not all(args):
                 return
             CommandConfig.Actions.__n_args_handler(session.send_command, Commands.rmdir, args)
