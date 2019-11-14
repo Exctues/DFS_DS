@@ -97,17 +97,17 @@ class CommandConfig:
 
         @staticmethod
         def make_file(session, args):
-            args = map(session.resolve_partial_path, args)
+            args = list(map(session.resolve_partial_path, args))
             if not all(args):
                 return
             CommandConfig.Actions.__n_args_handler(session.send_command, Commands.make_file, args)
 
         @staticmethod
         def print(session, args):
-            args = map(session.resolve_full_path, args)
-            if not all(args):
+            source = session.resolve_full_path(args[0])
+            if not source:
                 return
-            session.handle_print(Commands.print, args[0])
+            session.handle_print(Commands.print, source)
 
         @staticmethod
         def upload(session, args):

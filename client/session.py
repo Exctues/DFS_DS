@@ -177,17 +177,16 @@ class Session:
 
         with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as sock:
             sock.connect((ip, Constants.STORAGE_PORT))
-            sock.send(source)
+            sock.send(source.encode('utf-8'))
             res = ""
 
+            data = sock.recv(1024)
             while data:
+                res += data.decode('utf-8')
+                sock.send('ok'.encode('utf-8'))
+                
                 data = sock.recv(1024)
-                if data:
-                    res += data.decode('utf-8')
-                    sock.send('1'.encode('utf-8'))
-                else:
-                    return
-        
+
         logger.print_info(data)
 
     @staticmethod
