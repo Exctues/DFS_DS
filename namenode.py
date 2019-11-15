@@ -57,13 +57,13 @@ def multicast(cmd, arg1='', arg2=''):
     while len(dirty_nodes.nodes) > 0:
         pass
 
-    for ip in clean_nodes.nodes:
-        thread = Thread(target=send_args, args=[ip, Constants.STORAGE_PORT, cmd, arg1, arg2])
+    for address in clean_nodes.nodes:
+        thread = Thread(target=send_args, args=[address[0], address[1], cmd, arg1, arg2])
         thread.start()
 
 
 @logger.log
-def random_ip():
+def random_address():
     return random.sample(clean_nodes.nodes, 1)[0]
 
 
@@ -101,16 +101,17 @@ def new_nodes_listener():
             code = int(con.recv(1024).decode('utf-8'))
 
             if code == Codes.i_clear:
-                dirty_nodes.nodes.discard(addr[0])
-                clean_nodes.nodes.add(addr[0])
+                dirty_nodes.nodes.discard(addr)
+                clean_nodes.nodes.add(addr)
 
             elif code == Codes.init_new_storage:
                 if len(clean_nodes.nodes) > 0:
-                    dirty_nodes.nodes.add(addr[0])
-                    con.send(random_ip().encode('utf-8'))
+                    dirty_nodes.nodes.add(addr)
+                    address = random_address()
+                    con.send('{}:{}'.format(address[0], address[1]).encode('utf-8'))
                 else:
                     con.send('-1'.encode('utf-8'))
-                    clean_nodes.nodes.add(addr[0])
+                    clean_nodes.nodes.add(addr)
 
             elif code == Codes.get_all_storage_ips:
                 if len(clean_nodes.nodes) > 0:
@@ -156,15 +157,14 @@ while True:
 
         elif code == Codes.print:  # print # download
             source = con.recv(1024).decode('utf-8')
-            con.send(random_ip().encode('utf-8'))
-
+            con.send(random_address().encode('utf-8'))
 
         elif code == Codes.upload:  # upload
             filename = con.recv(1024).decode('utf-8')
             con.send('ok'.encode('utf-8'))
             size = int(con.recv(1024).decode('utf-8'))
             tree.insert(filename, size)
-            con.send(random_ip().encode('utf-8'))
+            con.send(random_address().encode('utf-8'))
 
         elif code == Codes.rm:  # rm
             filename = con.recv(1024).decode('utf-8')
