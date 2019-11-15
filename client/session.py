@@ -143,14 +143,16 @@ class Session:
         size = str(os.path.getsize(args[0]))
 
         sock = Session.send_command(command, args[1], size, close_socket=False)
-        ip = sock.recv(1024).decode('utf-8')
+        ip_port = sock.recv(1024).decode('utf-8')
+        ip, port = ip_port.split(':')
+        port = int(port)
         # sock.shutdown(0)
         sock.close()
 
         with open(args[0], 'rb') as host_file:
 
             with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as sock:
-                sock.connect((ip, Constants.STORAGE_PORT))
+                sock.connect((ip, port))
                 sock.send(str(command.code).encode('utf-8'))
                 #ack
                 sock.recv(1024)
@@ -171,12 +173,14 @@ class Session:
     @logger.log
     def handle_print(command, source):
         sock = Session.send_command(command, source, close_socket=False)
-        ip = sock.recv(1024).decode('utf-8')
+        ip_port = sock.recv(1024).decode('utf-8')
+        ip, port = ip_port.split(':')
+        port = int(port)
         # sock.shutdown(0)
         sock.close()
 
         with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as sock:
-            sock.connect((ip, Constants.STORAGE_PORT))
+            sock.connect((ip, port))
             sock.send(source.encode('utf-8'))
             res = ""
 
