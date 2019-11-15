@@ -1,4 +1,5 @@
 class Codes:
+    exit = -10
     help = -3
     cd = -2
     pwd = -1

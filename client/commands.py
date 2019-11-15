@@ -1,5 +1,6 @@
 from codes import Codes
 import logger
+import parameters
 
 from itertools import repeat
 
@@ -44,6 +45,8 @@ class CommandConfig:
 
         help = "Print help message"
 
+        exit = "Leave the program"
+
     class Usage:
         init = ""
 
@@ -64,6 +67,8 @@ class CommandConfig:
 
         help = "[<command>]"
 
+        exit = ""
+
     class Validators:
         cd = lambda n: n == 1
         pwd = lambda n: n == 0
@@ -83,36 +88,40 @@ class CommandConfig:
         rmdir = lambda n: n >= 1
 
         help = lambda n: n <= 1
+        exit = lambda n: True
 
     class Actions:
         @staticmethod
         def __n_args_handler(action, command, args):
-            map(action, repeat(command), args)
+            for arg in args:
+                action(command, arg)
 
         @staticmethod
         def init(session, args):
-            session.send_command(Commands.init, [])
+            session.send_command(Commands.init)
 
         @staticmethod
         def make_file(session, args):
-            args = map(session.resolve_partial_path, args)
+            args = list(map(session.resolve_partial_path, args))
             if not all(args):
                 return
             CommandConfig.Actions.__n_args_handler(session.send_command, Commands.make_file, args)
 
         @staticmethod
         def print(session, args):
-            args = map(session.resolve_full_path, args)
-            if not all(args):
+            source = session.resolve_full_path(args[0])
+            if not source:
                 return
-            session.handle_print(Commands.print, args[0])
+            session.handle_print(Commands.print, source)
 
         @staticmethod
         def upload(session, args):
             if len(args) == 1:
-                args.append(args[0])
+                file_name = args[0].split(parameters.sep)[-1]
+                file_path = session.resolve_partial_path(file_name)
 
-            args[1] = session.resolve_partial_path(args[1])
+                args.append(file_path)
+
             if not args[1]:
                 return
 
@@ -120,24 +129,24 @@ class CommandConfig:
 
         @staticmethod
         def rm(session, args):
-            args = map(session.resolve_full_path, args)
+            args = list(map(session.resolve_full_path, args))
             if not all(args):
                 return
             CommandConfig.Actions.__n_args_handler(session.send_command, Commands.rm, args)
 
         @staticmethod
         def info(session, args):
-            args = map(session.resolve_full_path, args)
+            args = list(map(session.resolve_full_path, args))
             if not all(args):
                 return
-            session.send_command(Commands.info, args)
+            session.send_command(Commands.info, *args)
 
         @staticmethod
         def copy(session, args):
             args[0] = session.resolve_full_path(args[0])
             if not all(args):
                 return
-            session.send_command(Commands.copy, args)
+            session.send_command(Commands.copy, *args)
 
         @staticmethod
         def move(session, args):
@@ -145,14 +154,15 @@ class CommandConfig:
             args[1] = session.resolve_partial_path(args[1])
             if not all(args):
                 return
-            session.send_command(Commands.move, args)
+            session.send_command(Commands.move, *args)
 
         @staticmethod
         def cd(session, args):
-            args = map(session.resolve_partial_path, args)
-            if not all(args):
+            new_path = session.resolve_full_path(args[0])
+            if not new_path:
                 return
-            session.change_curr_dir(args[0])
+
+            session.change_curr_dir(new_path)
 
         @staticmethod
         def pwd(session, args):
@@ -166,18 +176,18 @@ class CommandConfig:
             if not args[0]:
                 return
 
-            session.send_command(Commands.ls, args)
+            session.handle_ls(Commands.ls, args)
 
         @staticmethod
         def make_dir(session, args):
-            args = map(session.resolve_partial_path, args)
+            args = list(map(session.resolve_partial_path, args))
             if not all(args):
                 return
             CommandConfig.Actions.__n_args_handler(session.send_command, Commands.make_dir, args)
 
         @staticmethod
         def rmdir(session, args):
-            args = map(session.resolve_full_path, args)
+            args = list(map(session.resolve_full_path, args))
             if not all(args):
                 return
             CommandConfig.Actions.__n_args_handler(session.send_command, Commands.rmdir, args)
@@ -192,6 +202,11 @@ class CommandConfig:
                     logger.print_info("{}: {}\n{}".format(command.name, command.usage, command.description))
             else:
                 logger.print_info(Messages.help_message())
+
+        @staticmethod
+        def exit(session, args):
+            print("See ya!")
+            exit(0)
 
 
 class _Command:
@@ -247,6 +262,7 @@ class Commands:
     make_dir = _Command("make_dir")
     rmdir = _Command("rmdir")
     help = _Command("help")
+    exit = _Command("exit")
 
     @staticmethod
     def list():

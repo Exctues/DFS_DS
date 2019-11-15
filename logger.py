@@ -42,9 +42,18 @@ def log(func):
     def wrapper(*args, **kwargs):
         func_str = func.__name__
         args_str = ', '.join([str(arg) for arg in args])
-        kwargs_str = ', '.join([':'.join([str(j) for j in i]) for i in kwargs.values()])
-        if parameters.verbose:
-            print_debug_info("Function:", func_str, "args:", args_str, "kwargs:", kwargs_str)
-        return func(*args, **kwargs)
+        kwargs_str = ', '.join([str(k) + ':' + str(v) for k, v in kwargs.items()])
+
+        res = func(*args, **kwargs)
+
+        info = "\nFUNCTION {}:: {}; {}".format(func_str, 
+                                               (Colors.colored("args: ", Colors.UNDERLINE) + args_str)
+                                               if args else "", 
+                                               (Colors.colored("kwargs: ", Colors.UNDERLINE) + kwargs_str) 
+                                               if kwargs else "")
+
+        print_debug_info(info)
+        print_debug_info("RES", res, '\n')
+        return res
 
     return wrapper

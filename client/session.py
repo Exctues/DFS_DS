@@ -38,23 +38,24 @@ class Session:
         logger.print_debug_info("built partial path:", res)
         path = res.split(parameters.sep)
         path = list(filter(lambda path: path != '', path))
-        # if len(path) <= 1:
-            # return path
+
+        if len(path) <= 1:
+            return parameters.sep + parameters.sep.join(path)
+
         part_path = path[:-new_length]
         new_path = path[-new_length:]
+
         part_path = parameters.sep + parameters.sep.join(part_path)
         part_path = self.validate_path(part_path)
-        logger.print_debug_info("Received from validate_path:", part_path)
+
         if part_path:
             part_path = part_path.strip(parameters.sep)
         else:
             logger.handle_error("Path is not valid")
             return None
 
-        res = f"{parameters.sep}{parameters.sep.join(part_path)}" \
-              f"{parameters.sep}{parameters.sep.join(new_path)}"
-
-        logger.print_debug_info("{} -> {}".format(parameters.path_sep + parameters.path_sep.join(path), res))
+        res = "{}{}{}{}".format(parameters.sep, part_path, parameters.sep, 
+                                parameters.sep.join(new_path))
 
         return res
 
@@ -62,8 +63,6 @@ class Session:
     def resolve_full_path(self, path):
         res = self.__build_path(path)
         res = self.validate_path(res)
-        if parameters.verbose:
-            logger.print_debug_info("{} -> {}".format(path, res))
 
         return res
 
@@ -75,13 +74,17 @@ class Session:
         else:
             curr_dir = self.get_curr_dir().strip(parameters.sep)
 
-            res = f"{parameters.sep}{curr_dir}" \
-                  f"{parameters.sep}{path.strip(parameters.sep)}"
-
+            res = "{}{}{}{}".format(parameters.sep, curr_dir, parameters.sep, path.strip(parameters.sep))
+        
         return res
 
     @staticmethod
+    @logger.log
     def validate_path(path):
+        if not path or path == parameters.sep:
+            # root
+            return '/'
+
         with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as sock:
             sock.connect((Constants.NAMENODE_IP, Constants.CLIENT_TO_NAMENODE))
             sock.send(str(Codes.validate_path).encode('utf-8'))
@@ -122,7 +125,7 @@ class Session:
     @staticmethod
     @logger.log
     def handle_ls(command, args):
-        sock = Session.send_command(command, args, close_socket=False)
+        sock = Session.send_command(command, *args, close_socket=False)
         l = sock.recv(1024).decode('utf-8')
         l = l.split(parameters.path_sep)
         logger.print_info('\n'.join(l))
@@ -137,19 +140,22 @@ class Session:
             logger.handle_error("Incorrect host path specified!")
             return
 
-        with open(args[0], 'rb') as host_file:
-            size = str(os.path.getsize(args[0]))
+        size = str(os.path.getsize(args[0]))
 
-            sock = Session.send_command(command, (args[1], size), close_socket=False)
-            ip = sock.recv(1024).decode('utf-8')
-            # sock.shutdown(0)
-            sock.close()
+        sock = Session.send_command(command, args[1], size, close_socket=False)
+        ip = sock.recv(1024).decode('utf-8')
+        # sock.shutdown(0)
+        sock.close()
+
+        with open(args[0], 'rb') as host_file:
 
             with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as sock:
                 sock.connect((ip, Constants.STORAGE_PORT))
-                sock.send(args[1])
+                sock.send(str(command.code).encode('utf-8'))
+                #ack
                 sock.recv(1024)
-                sock.send('1'.encode('utf-8'))
+                sock.send((args[1] + ';1').encode('utf-8'))
+
                 data = host_file.read(1024)
 
                 while data:
@@ -164,41 +170,36 @@ class Session:
     @staticmethod
     @logger.log
     def handle_print(command, source):
-        sock = Session.send_command(command, (source,), close_socket=False)
+        sock = Session.send_command(command, source, close_socket=False)
         ip = sock.recv(1024).decode('utf-8')
         # sock.shutdown(0)
         sock.close()
 
         with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as sock:
             sock.connect((ip, Constants.STORAGE_PORT))
-            sock.send(source)
+            sock.send(source.encode('utf-8'))
             res = ""
 
+            data = sock.recv(1024)
             while data:
+                res += data.decode('utf-8')
+                sock.send('ok'.encode('utf-8'))
+                
                 data = sock.recv(1024)
-                if data:
-                    res += data.decode('utf-8')
-                    sock.send('1'.encode('utf-8'))
-                else:
-                    return
-        
+
         logger.print_info(data)
 
     @staticmethod
     @logger.log
-    def send_command(command, args, close_socket=True):
+    def send_command(command, *args, close_socket=True):
         # Send command to the namenode, send arguments and return socket
-
         sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         sock.connect((Constants.NAMENODE_IP, Constants.CLIENT_TO_NAMENODE))
         sock.send(str(command.code).encode('utf-8'))
-        logger.print_debug_info("Sent command", command.name)
 
         for arg in args:
             sock.recv(1024)
-            logger.print_debug_info("Received ack")
             sock.send(arg.encode('utf-8'))
-            logger.print_debug_info("Sent arg", arg)
 
         if close_socket:
             # sock.shutdown(0)

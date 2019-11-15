@@ -12,23 +12,35 @@ class CommandHandler:
     @staticmethod
     @logger.log
     def handle_copy(source, destination):
+        # to properly join
+        full_path = full_path.strip(os.sep)
+
         shutil.copy(os.path.join(Constants.STORAGE_PATH, source),
                     os.path.join(Constants.STORAGE_PATH, destination))
 
     @staticmethod
     @logger.log
     def handle_move(source, destination):
+        # to properly join
+        full_path = full_path.strip(os.sep)
+
         shutil.move(os.path.join(Constants.STORAGE_PATH, source),
                     os.path.join(Constants.STORAGE_PATH, destination))
 
     @staticmethod
     @logger.log
     def handle_rm(full_path):
+        # to properly join
+        full_path = full_path.strip(os.sep)
+
         os.remove(os.path.join(Constants.STORAGE_PATH, full_path))
 
     @staticmethod
     @logger.log
     def handle_upload_from(socket: socket.socket, full_path):
+        # to properly join
+        full_path = full_path.strip(os.sep)
+
         # receiving file from a client
         logger.print_debug_info("Sending", full_path)
         with open(os.path.join(Constants.STORAGE_PATH, full_path), 'wb+') as file:
@@ -95,6 +107,7 @@ class CommandHandler:
         # send file to everybody
         if storages_ip == '-1':
             return
+        storages_ip = storages_ip.split(";")
 
         for ip in storages_ip:
             sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -110,17 +123,26 @@ class CommandHandler:
     @staticmethod
     @logger.log
     def handle_mkdir(full_path):
+        # to properly join
+        full_path = full_path.strip(os.sep)
         os.makedirs(os.path.join(Constants.STORAGE_PATH, full_path), exist_ok=True)
 
     @staticmethod
     @logger.log
     def handle_make_file(full_path):
+        # to properly join
+        full_path = full_path.strip(os.sep)
         with open(os.path.join(Constants.STORAGE_PATH, full_path), "wb+"):
+            logger.print_debug_info(os.path.join(
+                Constants.STORAGE_PATH, full_path))
             return
 
     @staticmethod
     @logger.log
     def handle_rmdir(full_path):
+        # to properly join
+        full_path = full_path.strip(os.sep)
+        
         os.rmdir(full_path)
 
     @staticmethod
