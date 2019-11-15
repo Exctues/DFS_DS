@@ -7,6 +7,20 @@ from constants import Constants
 import logger
 
 
+def next_free_port(port=1488, max_port=65535):
+    sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    sock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
+
+    while port <= max_port:
+        try:
+            sock.bind(('', port))
+            # sock.close()
+            return sock, port
+        except OSError:
+            port += 1
+    raise IOError('no free ports')
+
+
 class NamenodeListener(Thread):
     def __init__(self, sock: socket.socket):
         super().__init__(daemon=True)
@@ -85,14 +99,18 @@ class ClientListener(Thread):
 
 
 @logger.log
-def get_sync_storage_ip():
+def get_sync_storage_ip(port):
     sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     sock.connect((Constants.NAMENODE_IP, Constants.NEW_NODES_PORT))
     sock.send(str(Codes.init_new_storage).encode('utf-8'))
-    to_sync = sock.recv(1024).decode('utf-8')
+    sock.recv(1024)
+    sock.send(str(port).encode('utf-8'))
+    # to_sync - ip:port
+    sync_ip, sync_port = sock.recv(1024).decode('utf-8').split(':')
     sock.close()
-    return to_sync
+    return sync_ip, sync_port
 
+#TODO: добавить в принте порт и в аплоаде
 
 @logger.log
 def notify_i_clear():
@@ -113,18 +131,18 @@ def remove_and_create_storage_dirs():
 
 
 @logger.log
-def init_sync():
+def init_sync(my_port):
     # First we delete everything we have
     # because we don't resurrect old nodes.
     remove_and_create_storage_dirs()
 
-    storage_ip = get_sync_storage_ip()
-    logger.print_debug_info("storage_ip", storage_ip)
-    if storage_ip == '-1':
+    syn_storage_ip, syn_port = get_sync_storage_ip(my_port)
+    logger.print_debug_info("storage_ip", syn_storage_ip)
+    if syn_storage_ip == '-1':
         return
     sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     # connect and ask for all files
-    sock.connect((storage_ip, Constants.STORAGE_PORT))
+    sock.connect((syn_storage_ip, syn_port))
     sock.send(str(Codes.download_all).encode('utf-8'))
 
     # From this point we are going to receive a lot mkdir, and upload requests
@@ -139,11 +157,12 @@ def init_sync():
 
 @logger.log
 def main():
-    sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-    sock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
-    sock.bind(('', Constants.STORAGE_PORT))
+    sock, port = next_free_port()
+    # sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    # sock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
+    # sock.bind(('', Constants.STORAGE_PORT))
     sock.listen()
-    init_sync()
+    init_sync(port)
     while True:
         logger.print_debug_info("Wait on accept.")
         sck, addr = sock.accept()
