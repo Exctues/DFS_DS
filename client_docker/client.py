@@ -1,4 +1,4 @@
-from client.commands import *
+from client.commands import Commands, Messages
 from client.session import Session
 import parameters
 from constants import Constants

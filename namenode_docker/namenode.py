@@ -1,9 +1,6 @@
 # N cmd data
-import os
 import random
-import time
 import socket
-import sys
 from namenode.tree import FSTree
 from constants import Constants
 from codes import Codes
@@ -68,19 +65,19 @@ def random_ip():
 
 
 # thread that pings nodes and modify storage_nodes
-@logger.log
-def ping():
-    def ping_thread():
-        while True:
-            for ip in clean_nodes.nodes.copy():
-                response = os.system("ping -c 1 " + ip)
-                if response != 0:
-                    with clean_nodes.lock:
-                        clean_nodes.nodes.discard(ip)
-            time.sleep(30)
-
-    heartbeat = Thread(target=ping_thread)
-    heartbeat.start()
+# @logger.log
+# def ping():
+#     def ping_thread():
+#         while True:
+#             for ip in clean_nodes.nodes.copy():
+#                 response = os.system("ping -c 1 " + ip)
+#                 if response != 0:
+#                     with clean_nodes.lock:
+#                         clean_nodes.nodes.discard(ip)
+#             time.sleep(30)
+#
+#     heartbeat = Thread(target=ping_thread)
+#     heartbeat.start()
 
 
 # thread that listens and add new storage nodes
@@ -124,7 +121,7 @@ def new_nodes_listener():
     new_nodes_listener.start()
 
 
-ping()
+# ping()
 new_nodes_listener()
 
 tree = FSTree()
