@@ -43,4 +43,3 @@ services:
 #      - "namenode"
 #    networks:
 #      - mynetwork
-

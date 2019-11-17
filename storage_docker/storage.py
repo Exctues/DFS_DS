@@ -89,6 +89,8 @@ def get_sync_storage_ip():
     sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     sock.connect((Constants.NAMENODE_IP, Constants.NEW_NODES_PORT))
     sock.send(str(Codes.init_new_storage).encode('utf-8'))
+    sock.recv(1024)
+    sock.send(socket.gethostname().encode('utf-8'))
     to_sync = sock.recv(1024).decode('utf-8')
     sock.close()
     return to_sync
