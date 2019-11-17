@@ -3,4 +3,4 @@ WORKDIR /dfsds
 EXPOSE 1024-65535
 ENV PYTHONUNBUFFERED=1
 COPY . .
-CMD ["python3","client.py"]
+#CMD ["python3","client.py"]
