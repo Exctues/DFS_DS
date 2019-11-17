@@ -15,6 +15,7 @@ services:
       - "322:322"
     networks:
       - mynetwork
+      - ingress
 
 
   storage:
@@ -29,6 +30,7 @@ services:
       - "namenode"
     networks:
       - mynetwork
+      - ingress
 
 
 #  client:
