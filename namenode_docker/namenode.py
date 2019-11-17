@@ -1,9 +1,6 @@
 # N cmd data
-import os
 import random
-import time
 import socket
-import sys
 from namenode.tree import FSTree
 from constants import Constants
 from codes import Codes
@@ -67,20 +64,21 @@ def random_ip():
     return random.sample(clean_nodes.nodes, 1)[0]
 
 
+# TODO: GOOD PING
 # thread that pings nodes and modify storage_nodes
-@logger.log
-def ping():
-    def ping_thread():
-        while True:
-            for ip in clean_nodes.nodes.copy():
-                response = os.system("ping -c 1 " + ip)
-                if response != 0:
-                    with clean_nodes.lock:
-                        clean_nodes.nodes.discard(ip)
-            time.sleep(30)
-
-    heartbeat = Thread(target=ping_thread)
-    heartbeat.start()
+# @logger.log
+# def ping():
+#     def ping_thread():
+#         while True:
+#             for ip in clean_nodes.nodes.copy():
+#                 response = os.system("ping -c 1 " + ip)
+#                 if response != 0:
+#                     with clean_nodes.lock:
+#                         clean_nodes.nodes.discard(ip)
+#             time.sleep(30)
+#
+#     heartbeat = Thread(target=ping_thread)
+#     heartbeat.start()
 
 
 # thread that listens and add new storage nodes
@@ -99,18 +97,22 @@ def new_nodes_listener():
             con, addr = soc.accept()
             print('new storage node connection')
             code = int(con.recv(1024).decode('utf-8'))
+            # ack
+            con.send('ack'.encode('utf-8'))
+            storagename = con.recv(1024).decode('utf-8')
 
             if code == Codes.i_clear:
-                dirty_nodes.nodes.discard(addr[0])
-                clean_nodes.nodes.add(addr[0])
+                dirty_nodes.nodes.discard(storagename)
+                clean_nodes.nodes.add(storagename)
 
             elif code == Codes.init_new_storage:
+
                 if len(clean_nodes.nodes) > 0:
-                    dirty_nodes.nodes.add(addr[0])
+                    dirty_nodes.nodes.add(storagename)
                     con.send(random_ip().encode('utf-8'))
                 else:
                     con.send('-1'.encode('utf-8'))
-                    clean_nodes.nodes.add(addr[0])
+                    clean_nodes.nodes.add(storagename)
 
             elif code == Codes.get_all_storage_ips:
                 if len(clean_nodes.nodes) > 0:
@@ -124,7 +126,7 @@ def new_nodes_listener():
     new_nodes_listener.start()
 
 
-ping()
+# ping()
 new_nodes_listener()
 
 tree = FSTree()
@@ -136,10 +138,13 @@ while True:
     soc.bind(('', Constants.CLIENT_TO_NAMENODE))
     soc.listen()
     while True:
+
         con, addr = soc.accept()  # addr is a tuple
         logger.print_debug_info('new client connection')
+
         code = int(con.recv(1024).decode('utf-8'))
         logger.print_debug_info('get code' + str(code))
+
         con.send('ok'.encode('utf-8'))
 
         if code == Codes.init:  # init

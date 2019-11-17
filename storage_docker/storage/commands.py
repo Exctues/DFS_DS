@@ -13,7 +13,7 @@ class CommandHandler:
     @logger.log
     def handle_copy(source, destination):
         # to properly join
-        full_path = full_path.strip(os.sep)
+        full_path = source.strip(os.sep)
 
         shutil.copy(os.path.join(Constants.STORAGE_PATH, source),
                     os.path.join(Constants.STORAGE_PATH, destination))
@@ -22,7 +22,7 @@ class CommandHandler:
     @logger.log
     def handle_move(source, destination):
         # to properly join
-        full_path = full_path.strip(os.sep)
+        full_path = source.strip(os.sep)
 
         shutil.move(os.path.join(Constants.STORAGE_PATH, source),
                     os.path.join(Constants.STORAGE_PATH, destination))
