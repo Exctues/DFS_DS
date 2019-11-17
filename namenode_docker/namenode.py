@@ -95,30 +95,38 @@ def new_nodes_listener():
             # i_clear = 15
 
             con, addr = soc.accept()
-            print('new storage node connection')
             code = int(con.recv(1024).decode('utf-8'))
             # ack
             con.send('ack'.encode('utf-8'))
             storagename = con.recv(1024).decode('utf-8')
 
             if code == Codes.i_clear:
+                logger.print_debug_info("Node {} says it's clean".format(addr))
                 dirty_nodes.nodes.discard(storagename)
                 clean_nodes.nodes.add(storagename)
 
             elif code == Codes.init_new_storage:
-
                 if len(clean_nodes.nodes) > 0:
                     dirty_nodes.nodes.add(storagename)
-                    con.send(random_ip().encode('utf-8'))
+                    copy_from = random_ip()
+                    con.send(copy_from.encode('utf-8'))
+                    logger.print_debug_info("New storage node {} connected "
+                                            "and will copy from {}".format(addr, copy_from))
                 else:
+                    # sanity check
+                    assert len(dirty_nodes.nodes) == 0
                     con.send('-1'.encode('utf-8'))
                     clean_nodes.nodes.add(storagename)
+                    logger.print_debug_info("New storage node {} connected and, system init".format(addr))
 
             elif code == Codes.get_all_storage_ips:
                 if len(clean_nodes.nodes) > 0:
-                    con.send(';'.join(clean_nodes.nodes).encode('utf-8'))
+                    res = ';'.join(clean_nodes.nodes)
                 else:
-                    con.send('-1'.encode('utf-8'))
+                    res = '-1'
+
+                con.send(res.encode('utf-8'))
+                logger.print_debug_info("Node {} requested ip list. Sending {}".format(addr, res))
 
             con.close()
 
