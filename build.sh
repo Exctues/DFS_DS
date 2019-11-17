@@ -28,5 +28,9 @@ sudo docker tag storage:2.0 concrete13377/storage:2.0
 sudo docker push concrete13377/storage:2.0
 
 
-# now how to actually use it
-#
+## now how to actually use it
+# sudo docker-compose up
+## in another terminal:
+# sudo docker run --network="dfs_ds_mynetwork" concrete13377/client:2.0 python3 client.py make_file hi.txt
+## to add storage nodes:
+# sudo docker-compose scale storage=2
