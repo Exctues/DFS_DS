@@ -1,8 +1,6 @@
-from codes import Codes
-import logger
-import parameters
-
-from itertools import repeat
+from utils.codes import Codes
+import utils.logger as logger
+import utils.parameters as parameters
 
 
 class Messages:

@@ -1,8 +1,8 @@
 from client.commands import Commands, Messages
 from client.session import Session
-import parameters
-from constants import Constants
-import logger
+import utils.parameters as parameters
+from utils.constants import Constants
+import utils.logger as logger
 
 import argparse
 import sys

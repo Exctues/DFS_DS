@@ -1,7 +1,7 @@
-from constants import Constants
-from codes import Codes
-import parameters
-import logger
+from utils.constants import Constants
+from utils.codes import Codes
+
+from utils import parameters, logger
 
 import os
 import socket

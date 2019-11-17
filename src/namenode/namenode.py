@@ -1,11 +1,13 @@
 # N cmd data
+from namenode.tree import FSTree
+from utils.constants import Constants
+from utils.codes import Codes
+from utils import logger
+
 import random
 import socket
-from namenode.tree import FSTree
-from constants import Constants
-from codes import Codes
+
 from threading import Thread, Lock
-import logger
 
 
 class Nodes:
