@@ -64,6 +64,7 @@ def random_ip():
     return random.sample(clean_nodes.nodes, 1)[0]
 
 
+# TODO: GOOD PING
 # thread that pings nodes and modify storage_nodes
 # @logger.log
 # def ping():

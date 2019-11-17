@@ -2,5 +2,5 @@
 # а в докеркомпоз ап не поддерживаются ключи деплой, поэтму реплики нужно делать через композ скейл
 #чтобы запустить и было нормально, нужно:
 
-sudo docker-compose up -d
+sudo docker-compose up
 sudo docker-compose scale storage=3

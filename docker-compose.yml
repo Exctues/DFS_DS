@@ -7,7 +7,7 @@ networks:
 
 services:
   namenode:
-    image: concrete13377/namenode:1.0
+    image: concrete13377/namenode:2.0
     deploy:
       replicas: 1
       resources:
@@ -22,7 +22,7 @@ services:
         ipv4_address: 172.20.0.6
 
   storage:
-    image: concrete13377/storage:1.0
+    image: concrete13377/storage:2.0
     deploy:
       replicas: 2
       resources:
@@ -35,16 +35,16 @@ services:
       - mynetwork
 
 
-  client:
-    image: concrete13377/client:1.0
-    deploy:
-      replicas: 1
-      resources:
-        limits:
-          cpus: "0.1"
-          memory: 50M
-    depends_on:
-      - "namenode"
-    networks:
-      - mynetwork
+#  client:
+#    image: concrete13377/client:2.0
+#    deploy:
+#      replicas: 1
+#      resources:
+#        limits:
+#          cpus: "0.1"
+#          memory: 50M
+#    depends_on:
+#      - "namenode"
+#    networks:
+#      - mynetwork
 
