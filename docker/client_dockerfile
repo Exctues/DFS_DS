@@ -2,7 +2,7 @@ FROM python:3.7-alpine
 WORKDIR /dfsds
 EXPOSE 1024-65535
 ENV PYTHONUNBUFFERED=1
-COPY client client
-COPY utils utils
+COPY src/client client
+COPY src/utils utils
 
 CMD ["python3","client.py"]
