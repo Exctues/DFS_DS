@@ -103,7 +103,8 @@ venv.bak/
 # mypy
 .mypy_cache/
 
-# pycharm
+# pycharm and other
 .idea/
+.vscode/*
 
 docker/.ssh*
