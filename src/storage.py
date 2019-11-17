@@ -102,6 +102,8 @@ def notify_i_clear():
     sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     sock.connect((Constants.NAMENODE_IP, Constants.NEW_NODES_PORT))
     sock.send(str(Codes.i_clear).encode('utf-8'))
+    sock.recv(1024)
+    sock.send(socket.gethostname().encode('utf-8'))
     sock.close()
 
 
