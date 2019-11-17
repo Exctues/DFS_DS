@@ -1,10 +1,11 @@
 import os
 import socket
+
 from threading import Thread
-from codes import Codes
+from utils.codes import Codes
 from storage.commands import CommandHandler
-from constants import Constants
-import logger
+from utils.constants import Constants
+from utils import logger
 
 
 class NamenodeListener(Thread):

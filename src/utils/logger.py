@@ -1,5 +1,5 @@
-import parameters
-import itertools
+from utils import parameters
+
 
 class Colors:
     OKBLUE = '\033[94m'

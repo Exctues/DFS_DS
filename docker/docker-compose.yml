@@ -2,10 +2,9 @@ version: "3.5"
 networks:
   mynetwork:
 
-
 services:
   namenode:
-    image: concrete13377/namenode:3.0
+    image: concrete13377/namenode:3.1
     deploy:
       placement:
         constraints:
@@ -22,7 +21,7 @@ services:
 
 
   storage:
-    image: concrete13377/storage:3.0
+    image: concrete13377/storage:3.1
     deploy:
       replicas: 3
       placement:

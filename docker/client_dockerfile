@@ -1,0 +1,9 @@
+FROM python:3.7-alpine
+WORKDIR /dfsds
+EXPOSE 1024-65535
+ENV PYTHONUNBUFFERED=1
+COPY src/client client
+COPY src/utils utils
+COPY src/client.py client.py
+
+CMD ["python3","client.py"]

@@ -1,9 +1,9 @@
 import os
 import shutil
 import socket
-from constants import Constants
-from codes import Codes
-import logger
+from utils.constants import Constants
+from utils.codes import Codes
+from utils import logger
 
 
 # full_path is expected to start with '/', not '/var/dfs_storage/
