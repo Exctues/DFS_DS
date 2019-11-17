@@ -2,10 +2,14 @@ version: "3.5"
 networks:
   mynetwork:
 
+
 services:
   namenode:
-    image: concrete13377/namenode:2.0
+    image: concrete13377/namenode:3.0
     deploy:
+      placement:
+        constraints:
+          - node.role == manager
 #      resources:
 #        limits:
 #          cpus: "0.1"
@@ -15,13 +19,15 @@ services:
       - "322:322"
     networks:
       - mynetwork
-      - ingress
 
 
   storage:
-    image: concrete13377/storage:2.0
+    image: concrete13377/storage:3.0
     deploy:
       replicas: 3
+      placement:
+        constraints:
+          - node.role == worker
 #      resources:
 #        limits:
 #          cpus: "0.3"
@@ -30,18 +36,4 @@ services:
       - "namenode"
     networks:
       - mynetwork
-      - ingress
 
-
-#  client:
-#    image: concrete13377/client:2.0
-#    deploy:
-#      replicas: 1
-#      resources:
-#        limits:
-#          cpus: "0.1"
-#          memory: 50M
-#    depends_on:
-#      - "namenode"
-#    networks:
-#      - mynetwork

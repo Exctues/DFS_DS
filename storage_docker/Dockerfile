@@ -2,5 +2,5 @@ FROM python:3.7-alpine
 WORKDIR /dfsds
 ENV PYTHONUNBUFFERED=1
 COPY . .
-EXPOSE 1488
+EXPOSE 1488 2377 7946 4789
 CMD ["python3","storage.py"]

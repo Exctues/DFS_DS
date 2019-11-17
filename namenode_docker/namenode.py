@@ -138,10 +138,13 @@ while True:
     soc.bind(('', Constants.CLIENT_TO_NAMENODE))
     soc.listen()
     while True:
+
         con, addr = soc.accept()  # addr is a tuple
         logger.print_debug_info('new client connection')
+
         code = int(con.recv(1024).decode('utf-8'))
         logger.print_debug_info('get code' + str(code))
+
         con.send('ok'.encode('utf-8'))
 
         if code == Codes.init:  # init
