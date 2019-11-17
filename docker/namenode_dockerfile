@@ -4,4 +4,4 @@ ENV PYTHONUNBUFFERED=1
 COPY src/namenode namenode
 COPY src/utils utils
 EXPOSE 1337 322 2377 7946 4789
-CMD ["python3","namenode.py"]
+CMD ["python3","namenode/namenode.py"]

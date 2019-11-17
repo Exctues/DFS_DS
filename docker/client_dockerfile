@@ -5,4 +5,4 @@ ENV PYTHONUNBUFFERED=1
 COPY src/client client
 COPY src/utils utils
 
-CMD ["python3","client.py"]
+CMD ["python3","client/client.py"]

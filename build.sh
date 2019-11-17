@@ -1,16 +1,15 @@
 VERSION="3.1"
 USER="concrete13377"
-cd docker
 
-docker build -t=client:$VERSION -f client_dockerfile src
+docker build -t=client:$VERSION -f docker/client_dockerfile .
 docker tag client:$VERSION $USER/client:$VERSION
 docker push $USER/client:$VERSION
 
-docker build -t=namenode:$VERSION namenode_docker
+docker build -t=namenode:$VERSION -f docker/namenode_dockerfile .
 docker tag namenode:$VERSION $USER/namenode:$VERSION
 docker push $USER/namenode:$VERSION
 
-docker build -t=storage:$VERSION storage_docker
+docker build -t=storage:$VERSION -f docker/storage_dockerfile .
 docker tag storage:$VERSION $USER/storage:$VERSION
 docker push $USER/storage:$VERSION
 
