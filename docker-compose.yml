@@ -21,7 +21,7 @@ services:
   storage:
     image: concrete13377/storage:2.0
     deploy:
-      replicas: 1
+      replicas: 3
 #      resources:
 #        limits:
 #          cpus: "0.3"
