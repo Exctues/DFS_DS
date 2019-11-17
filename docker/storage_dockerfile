@@ -3,5 +3,6 @@ WORKDIR /dfsds
 ENV PYTHONUNBUFFERED=1
 COPY src/storage storage
 COPY src/utils utils
+COPY src/storage.py storage.py
 EXPOSE 1488 2377 7946 4789
-CMD ["python3","storage/storage.py"]
+CMD ["python3","storage.py"]

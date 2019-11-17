@@ -49,7 +49,8 @@ def setup_argparse():
 def interactive_loop(parser: argparse.ArgumentParser):
     while True:
         curr_command = input("> ").strip().split()
-        parser.parse_args(curr_command)
+        if curr_command:
+            parser.parse_args(curr_command)
 
 
 def check_connection():
