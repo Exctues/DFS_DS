@@ -13,7 +13,8 @@ class CommandHandler:
     @logger.log
     def handle_copy(source, destination):
         # to properly join
-        full_path = source.strip(os.sep)
+        source = source.strip(os.sep)
+        destination = destination.strip(os.sep)
 
         shutil.copy(os.path.join(Constants.STORAGE_PATH, source),
                     os.path.join(Constants.STORAGE_PATH, destination))
@@ -21,8 +22,8 @@ class CommandHandler:
     @staticmethod
     @logger.log
     def handle_move(source, destination):
-        # to properly join
-        full_path = source.strip(os.sep)
+        source = source.strip(os.sep)
+        destination = destination.strip(os.sep)
 
         shutil.move(os.path.join(Constants.STORAGE_PATH, source),
                     os.path.join(Constants.STORAGE_PATH, destination))
@@ -40,11 +41,10 @@ class CommandHandler:
     def handle_upload_from(socket: socket.socket, full_path):
         # to properly join
         full_path = full_path.strip(os.sep)
-
         # receiving file from a client
-        logger.print_debug_info("Sending", full_path)
+        logger.print_debug_info("Receiving", full_path)
         with open(os.path.join(Constants.STORAGE_PATH, full_path), 'wb+') as file:
-            while data:
+            while True:
                 data = socket.recv(1024)
                 if data:
                     file.write(data)
@@ -55,8 +55,10 @@ class CommandHandler:
     @staticmethod
     @logger.log
     def handle_print_to(socket: socket.socket, full_path):
+        # to properly join
+        full_path = full_path.strip(os.sep)
         # sending file to a client
-        logger.print_debug_info("Receiving", full_path)
+        logger.print_debug_info("Sending", full_path)
         with open(os.path.join(Constants.STORAGE_PATH, full_path), 'rb') as file:
             data = file.read(1024)
             while data:
@@ -66,7 +68,7 @@ class CommandHandler:
 
     @staticmethod
     @logger.log
-    def handle_download_all(address: tuple):
+    def handle_download_all(ip: tuple):
         """address is (host, port) tuple
            We do separate request for each make_dir & upload request
            for simplicity of code.
@@ -74,9 +76,8 @@ class CommandHandler:
 
         @logger.log
         def ask(code, full_path):
-
             sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-            sock.connect(address)
+            sock.connect((ip, Constants.STORAGE_TO_STORAGE))
             sock.send(str(code).encode('utf-8'))
             sock.recv(1024)  # ack
             if code == Codes.upload:
@@ -93,7 +94,7 @@ class CommandHandler:
             ask(Codes.make_dir, dir_name)
             for file in file_list:
                 sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-                sock.connect(address)
+                sock.connect((ip, Constants.STORAGE_TO_STORAGE))
                 full_path = os.path.join(os.path.abspath(dir_name), file)[len(Constants.STORAGE_PATH):]
                 ask(Codes.upload, full_path)
 
@@ -111,7 +112,7 @@ class CommandHandler:
 
         for ip in storages_ip:
             sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-            sock.connect((ip, Constants.STORAGE_PORT))
+            sock.connect((ip, Constants.STORAGE_TO_STORAGE))
             # Check if another storage doesn't have a file
             if not CommandHandler._has_file(sock, full_path):
                 logger.print_debug_info("Distributing", full_path)
@@ -142,7 +143,7 @@ class CommandHandler:
     def handle_rmdir(full_path):
         # to properly join
         full_path = full_path.strip(os.sep)
-        
+
         os.rmdir(full_path)
 
     @staticmethod

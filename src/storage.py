@@ -45,13 +45,17 @@ class NamenodeListener(Thread):
                 os.removedirs(Constants.STORAGE_PATH)
             # then create this dir empty
             os.makedirs(Constants.STORAGE_PATH)
+        elif code == Codes.upload:
+            pass
+        elif code == Codes.print:
+            pass
         else:
             print("NamenodeListener: no command correspond to code", code)
 
         self.sock.close()
 
 
-class ClientListener(Thread):
+class StorageListener(Thread):
     def __init__(self, sock: socket.socket, address: tuple):
         super().__init__(daemon=True)
         self.sock = sock
@@ -74,7 +78,7 @@ class ClientListener(Thread):
                 # Performance or consistency? Consistency!
                 CommandHandler.distribute(full_path)
         elif code == Codes.download_all:
-            CommandHandler.handle_download_all(self.address)
+            CommandHandler.handle_download_all(self.address[0])
         else:
             print("ClientListener: no command correspond to code", code)
         # regarding shutdown:
@@ -121,7 +125,7 @@ def notify_i_clear():
 
 
 @logger.log
-def remove_and_create_storage_dirs():
+def recreate_storage_dirs():
     if os.path.exists(Constants.STORAGE_PATH):
         os.removedirs(Constants.STORAGE_PATH)
         logger.print_debug_info(Constants.STORAGE_PATH, "removed")
@@ -134,7 +138,7 @@ def remove_and_create_storage_dirs():
 def init_sync():
     # First we delete everything we have
     # because we don't resurrect old nodes.
-    remove_and_create_storage_dirs()
+    recreate_storage_dirs()
 
     storage_ip = get_sync_storage_ip()
     logger.print_debug_info("storage_ip", storage_ip)
@@ -142,7 +146,7 @@ def init_sync():
         return
     sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     # connect and ask for all files
-    sock.connect((storage_ip, Constants.STORAGE_PORT))
+    sock.connect((storage_ip, Constants.STORAGE_TO_STORAGE))
     sock.send(str(Codes.download_all).encode('utf-8'))
 
     # From this point we are going to receive a lot mkdir, and upload requests
@@ -155,24 +159,34 @@ def init_sync():
     sock.close()
 
 
+def waiter(sock: socket.socket, is_namenode):
+    logger.print_debug_info("Wait on accept.", "is_namenode = ", is_namenode)
+    sock, addr = sock.accept()
+    if is_namenode:
+        NamenodeListener(sock).start()
+    else:
+        logger.print_debug_info("This is Client(or Storage) connection", addr)
+        StorageListener(sock, addr).start()
+
+
 @logger.log
 def main():
-    sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-    sock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
-    sock.bind(('', Constants.STORAGE_PORT))
-    sock.listen()
+    # Create socket to communicate with namenode
+    sock_namenode = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    sock_namenode.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
+    sock_namenode.bind(('', Constants.NAMENODE_TO_STORAGE))
+    sock_namenode.listen()
+    Thread(target=waiter, args=(sock_namenode, True)).start()
+
+    # Create socket to communicate with storages
+    sock_storage = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    sock_storage.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
+    sock_storage.bind(('', Constants.STORAGE_TO_STORAGE))
+    sock_storage.listen()
+    Thread(target=waiter, args=(sock_storage, False)).start()
+
     ping_listener()
     init_sync()
-    while True:
-        logger.print_debug_info("Wait on accept.")
-        sck, addr = sock.accept()
-        # TODO find better way to determine - probably separate ports for namenode and client
-        if addr[0] == Constants.NAMENODE_IP:
-            logger.print_debug_info("This is Namenode connection", addr)
-            NamenodeListener(sck).start()
-        else:
-            logger.print_debug_info("This is Client(or Storage) connection", addr)
-            ClientListener(sck, addr).start()
 
 
 if __name__ == '__main__':
