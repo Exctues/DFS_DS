@@ -46,9 +46,15 @@ class NamenodeListener(Thread):
             # then create this dir empty
             os.makedirs(Constants.STORAGE_PATH)
         elif code == Codes.upload:
-            pass
+            full_path = self.sock.recv(1024).decode('utf-8').split(';')
+            self.sock.send('ok'.encode('utf-8'))
+            CommandHandler.handle_upload_from(self.sock, full_path)
+            CommandHandler.distribute(full_path)
         elif code == Codes.print:
-            pass
+            full_path = self.sock.recv(1024).decode('utf-8').split(';')
+            self.sock.send('ok'.encode('utf-8'))
+            CommandHandler.handle_print_to(self.sock, full_path)
+
         else:
             print("NamenodeListener: no command correspond to code", code)
 
@@ -70,13 +76,9 @@ class StorageListener(Thread):
             full_path = self.sock.recv(1024).decode('utf-8')
             CommandHandler.handle_print_to(self.sock, full_path)
         elif code == Codes.upload:
-            full_path, need_distribute = self.sock.recv(1024).decode('utf-8').split(';')
+            full_path = self.sock.recv(1024).decode('utf-8')
             self.sock.send('ok'.encode('utf-8'))
             CommandHandler.handle_upload_from(self.sock, full_path)
-            if need_distribute == '1':
-                # Important to decide whether to close socket right now or after distribution.
-                # Performance or consistency? Consistency!
-                CommandHandler.distribute(full_path)
         elif code == Codes.download_all:
             CommandHandler.handle_download_all(self.address[0])
         else:
