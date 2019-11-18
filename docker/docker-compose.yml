@@ -4,7 +4,7 @@ networks:
 
 services:
   namenode:
-    image: danieldv99/namenode:3.1
+    image: danieldv99/namenode:3.2
     deploy:
       mode: global
       placement:
@@ -22,7 +22,7 @@ services:
 
 
   storage:
-    image: danieldv99/storage:3.1
+    image: danieldv99/storage:3.2
     deploy:
       replicas: 3
       placement:

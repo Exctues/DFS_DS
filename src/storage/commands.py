@@ -44,13 +44,13 @@ class CommandHandler:
         # receiving file from a client
         logger.print_debug_info("Receiving", full_path)
         with open(os.path.join(Constants.STORAGE_PATH, full_path), 'wb+') as file:
-            while True:
-                data = socket.recv(1024)
+            data = socket.recv(1024)
+            while data:
                 if data:
                     file.write(data)
-                    socket.send('1'.encode('utf-8'))
                 else:
                     return
+                data = socket.recv(1024)
 
     @staticmethod
     @logger.log
@@ -63,7 +63,6 @@ class CommandHandler:
             data = file.read(1024)
             while data:
                 socket.send(data)
-                socket.recv(1)
                 data = file.read(1024)
 
     @staticmethod
@@ -106,9 +105,8 @@ class CommandHandler:
         # ask namenode for all storage's ips
         storages_ip = CommandHandler._get_all_storages_ip()
         # send file to everybody
-        if storages_ip == '-1':
+        if storages_ip is None:
             return
-        storages_ip = storages_ip.split(";")
 
         for ip in storages_ip:
             sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -153,8 +151,12 @@ class CommandHandler:
         sock.connect((Constants.NAMENODE_ADDRESS, Constants.NEW_NODES_PORT))
         sock.recv(1024)
         sock.send(socket.gethostname().encode('utf-8'))
-        ips = sock.recv(1024).decode('utf-8').strip().split(" ")
+        ips = sock.recv(1024).decode('utf-8').strip()
         sock.close()
+        if ips == '-1':
+            ips = None
+        else:
+            ips = ips.split(';')
         return ips
 
     @staticmethod
