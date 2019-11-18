@@ -110,6 +110,11 @@ class CommandConfig:
             source = session.resolve_full_path(args[0])
             if not source:
                 return
+
+            is_dir = session.is_dir(source)
+            if is_dir:
+                print("{} is not a file!".format(args[0]))
+                return
             session.handle_print(Commands.print, source)
 
         @staticmethod
@@ -129,6 +134,12 @@ class CommandConfig:
         def rm(session, args):
             args = list(map(session.resolve_full_path, args))
             if not all(args):
+                return
+
+            is_dir = list(map(session.is_dir, args))
+            if any(args):
+                idx = is_dir.index(1)
+                logger.handle_error("Path {} is not a file!".format(args[idx]))
                 return
             CommandConfig.Actions.__n_args_handler(session.send_command, Commands.rm, args)
 
@@ -201,6 +212,16 @@ class CommandConfig:
                 idx = is_dir.index(0)
                 logger.handle_error("Path {} is not a directory!".format(args[idx]))
                 return
+
+            for dir in args:
+                children = session.handle_ls(dir)
+
+                if len(children):
+                    logger.print_info("Directory is not empty. Do you want to remove it with all its contents?\n"
+                                      "Print \"yes\" to proceed, or anything else to abort operation.")
+                    response = input()
+                    if response.strip(" ") != "yes":
+                        return
 
             CommandConfig.Actions.__n_args_handler(session.send_command, Commands.rmdir, args)
 

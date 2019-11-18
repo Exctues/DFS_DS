@@ -45,13 +45,17 @@ class NamenodeListener(Thread):
                 os.removedirs(Constants.STORAGE_PATH)
             # then create this dir empty
             os.makedirs(Constants.STORAGE_PATH)
+        elif code == Codes.upload:
+            pass
+        elif code == Codes.print:
+            pass
         else:
             print("NamenodeListener: no command correspond to code", code)
 
         self.sock.close()
 
 
-class ClientListener(Thread):
+class StorageListener(Thread):
     def __init__(self, sock: socket.socket, address: tuple):
         super().__init__(daemon=True)
         self.sock = sock
@@ -162,7 +166,7 @@ def waiter(sock: socket.socket, is_namenode):
         NamenodeListener(sock).start()
     else:
         logger.print_debug_info("This is Client(or Storage) connection", addr)
-        ClientListener(sock, addr).start()
+        StorageListener(sock, addr).start()
 
 
 @logger.log
