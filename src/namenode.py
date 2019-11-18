@@ -184,7 +184,6 @@ while True:
             storage_sock.send(str(Codes.print).encode('utf-8'))
             storage_sock.recv(1024)
             storage_sock.send(source.encode('utf-8'))
-            storage_sock.recv(1024)
 
             data = storage_sock.recv(1024)
             while data:
