@@ -4,5 +4,5 @@ ENV PYTHONUNBUFFERED=1
 COPY src/storage storage
 COPY src/utils utils
 COPY src/storage.py storage.py
-EXPOSE 1488 228 2377 7946 4789
+EXPOSE 1488 228 4789 777 # 2377 7946
 CMD ["python3","storage.py"]
