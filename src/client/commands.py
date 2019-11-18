@@ -157,7 +157,12 @@ class CommandConfig:
         @staticmethod
         def cd(session, args):
             new_path = session.resolve_full_path(args[0])
+            is_dir = session.is_dir(new_path)
             if not new_path:
+                return
+
+            if not is_dir:
+                logger.handle_error("Not a directory!")
                 return
 
             session.change_curr_dir(new_path)
@@ -186,9 +191,17 @@ class CommandConfig:
 
         @staticmethod
         def rmdir(session, args):
+            # validate and build paths
             args = list(map(session.resolve_full_path, args))
             if not all(args):
                 return
+
+            is_dir = list(map(session.is_dir, args))
+            if not all(is_dir):
+                idx = is_dir.index(0)
+                logger.handle_error("Path {} is not a directory!".format(args[idx]))
+                return
+
             CommandConfig.Actions.__n_args_handler(session.send_command, Commands.rmdir, args)
 
         @staticmethod
