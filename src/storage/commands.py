@@ -149,7 +149,7 @@ class CommandHandler:
     @logger.log
     def _get_all_storages_ip():
         sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        sock.connect((Constants.NAMENODE_IP, Constants.NEW_NODES_PORT))
+        sock.connect((Constants.NAMENODE_ADDRESS, Constants.NEW_NODES_PORT))
         sock.recv(1024)
         sock.send(socket.gethostname().encode('utf-8'))
         ips = sock.recv(1024).decode('utf-8').strip().split(" ")

@@ -113,7 +113,7 @@ def get_sync_storage_ip():
 @logger.log
 def notify_i_clear():
     sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-    sock.connect((Constants.NAMENODE_IP, Constants.NEW_NODES_PORT))
+    sock.connect((Constants.NAMENODE_ADDRESS, Constants.NEW_NODES_PORT))
     sock.send(str(Codes.i_clear).encode('utf-8'))
     sock.recv(1024)
     sock.send(socket.gethostname().encode('utf-8'))
@@ -166,6 +166,7 @@ def main():
     while True:
         logger.print_debug_info("Wait on accept.")
         sck, addr = sock.accept()
+        # TODO find better way to determine - probably separate ports for namenode and client
         if addr[0] == Constants.NAMENODE_IP:
             logger.print_debug_info("This is Namenode connection", addr)
             NamenodeListener(sck).start()
