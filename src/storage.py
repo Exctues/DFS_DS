@@ -46,13 +46,12 @@ class NamenodeListener(Thread):
             # then create this dir empty
             os.makedirs(Constants.STORAGE_PATH)
         elif code == Codes.upload:
-            full_path = self.sock.recv(1024).decode('utf-8').split(';')
+            full_path = self.sock.recv(1024).decode('utf-8')
             self.sock.send('ok'.encode('utf-8'))
             CommandHandler.handle_upload_from(self.sock, full_path)
             CommandHandler.distribute(full_path)
         elif code == Codes.print:
-            full_path = self.sock.recv(1024).decode('utf-8').split(';')
-            self.sock.send('ok'.encode('utf-8'))
+            full_path = self.sock.recv(1024).decode('utf-8')
             CommandHandler.handle_print_to(self.sock, full_path)
 
         else:

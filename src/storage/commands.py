@@ -11,7 +11,7 @@ from utils import logger
 class CommandHandler:
     @staticmethod
     @logger.log
-    def handle_copy(source, destination):
+    def handle_copy(source: str, destination: str):
         # to properly join
         source = source.strip(os.sep)
         destination = destination.strip(os.sep)
@@ -21,7 +21,7 @@ class CommandHandler:
 
     @staticmethod
     @logger.log
-    def handle_move(source, destination):
+    def handle_move(source: str, destination: str):
         source = source.strip(os.sep)
         destination = destination.strip(os.sep)
 
@@ -30,7 +30,7 @@ class CommandHandler:
 
     @staticmethod
     @logger.log
-    def handle_rm(full_path):
+    def handle_rm(full_path: str):
         # to properly join
         full_path = full_path.strip(os.sep)
 
@@ -38,7 +38,7 @@ class CommandHandler:
 
     @staticmethod
     @logger.log
-    def handle_upload_from(socket: socket.socket, full_path):
+    def handle_upload_from(socket: socket.socket, full_path: str):
         # to properly join
         full_path = full_path.strip(os.sep)
         # receiving file from a client
@@ -54,7 +54,7 @@ class CommandHandler:
 
     @staticmethod
     @logger.log
-    def handle_print_to(socket: socket.socket, full_path):
+    def handle_print_to(socket: socket.socket, full_path: str):
         # to properly join
         full_path = full_path.strip(os.sep)
         # sending file to a client
@@ -74,7 +74,7 @@ class CommandHandler:
         """
 
         @logger.log
-        def ask(code, full_path):
+        def ask(code, full_path: str):
             sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
             sock.connect((ip, Constants.STORAGE_TO_STORAGE))
             sock.send(str(code).encode('utf-8'))
@@ -121,14 +121,14 @@ class CommandHandler:
 
     @staticmethod
     @logger.log
-    def handle_mkdir(full_path):
+    def handle_mkdir(full_path: str):
         # to properly join
         full_path = full_path.strip(os.sep)
         os.makedirs(os.path.join(Constants.STORAGE_PATH, full_path), exist_ok=True)
 
     @staticmethod
     @logger.log
-    def handle_make_file(full_path):
+    def handle_make_file(full_path: str):
         # to properly join
         full_path = full_path.strip(os.sep)
         with open(os.path.join(Constants.STORAGE_PATH, full_path), "wb+"):
@@ -138,7 +138,7 @@ class CommandHandler:
 
     @staticmethod
     @logger.log
-    def handle_rmdir(full_path):
+    def handle_rmdir(full_path: str):
         # to properly join
         full_path = full_path.strip(os.sep)
 
