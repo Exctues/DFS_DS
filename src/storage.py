@@ -86,6 +86,19 @@ class ClientListener(Thread):
 
 
 @logger.log
+def ping_listener():
+    def ping_listener_thread():
+        sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+        sock.bind(('', Constants.STORAGE_PING))
+        while True:
+            data, addr = sock.recvfrom(1024)
+            sock.sendto('pong'.encode('utf-8'), addr)
+
+    heartbeat_listen = Thread(target=ping_listener_thread)
+    heartbeat_listen.start()
+
+
+@logger.log
 def get_sync_storage_ip():
     sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     sock.connect((Constants.NAMENODE_IP, Constants.NEW_NODES_PORT))
@@ -148,6 +161,7 @@ def main():
     sock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
     sock.bind(('', Constants.STORAGE_PORT))
     sock.listen()
+    ping_listener()
     init_sync()
     while True:
         logger.print_debug_info("Wait on accept.")
