@@ -46,12 +46,12 @@ class CommandHandler:
         with open(os.path.join(Constants.STORAGE_PATH, full_path), 'wb+') as file:
             data = socket.recv(1024)
             while data:
-                data = socket.recv(1024)
                 if data:
                     file.write(data)
                     socket.send('1'.encode('utf-8'))
                 else:
                     return
+                data = socket.recv(1024)
 
     @staticmethod
     @logger.log

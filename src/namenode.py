@@ -180,7 +180,18 @@ while True:
             source = con.recv(1024).decode('utf-8')
 
             storage_sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-            storage_sock.connect((random_address(), Constants.STORAGE_PORT))
+            storage_sock.connect((random_address(), Constants.NAMENODE_TO_STORAGE))
+            storage_sock.send(str(Codes.print).encode('utf-8'))
+            storage_sock.recv(1024)
+            storage_sock.send(source.encode('utf-8'))
+            storage_sock.recv(1024)
+
+            data = storage_sock.recv(1024)
+            while data:
+                if data:
+                    con.send(data)
+                data = storage_sock.recv(1024)
+            storage_sock.close()
 
         elif code == Codes.upload:  # upload
             filename = con.recv(1024).decode('utf-8')
@@ -189,18 +200,17 @@ while True:
             con.send('ok'.encode('utf-8'))
 
             storage_sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-            storage_sock.connect((random_address(), Constants.STORAGE_PORT))
+            storage_sock.connect((random_address(), Constants.NAMENODE_TO_STORAGE))
+            storage_sock.send(str(Codes.upload).encode('utf-8'))
+            storage_sock.recv(1024)
+            storage_sock.send(filename.encode('utf-8'))
+            storage_sock.recv(1024)
 
             data = con.recv(1024)
-            storage_sock.send('ok'.encode('utf-8'))
-
             while data:
                 if data:
                     storage_sock.send(data)
-                    storage_sock.send('ok'.encode('utf-8'))
-
                 data = con.recv(1024)
-
             tree.insert(filename, size)
             storage_sock.close()
 
