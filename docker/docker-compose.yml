@@ -1,6 +1,7 @@
 version: "3.5"
 networks:
   mynetwork:
+    external: true
 
 services:
   namenode:
