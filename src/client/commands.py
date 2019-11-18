@@ -245,6 +245,9 @@ class _Command:
     def __str__(self):
         return self.__name
 
+    def __repr__(self):
+        return str(self.code)
+
 
 class Commands:
     cd = _Command("cd")

@@ -19,6 +19,7 @@ class Codes:
     rmdir = 10
 
     validate_path = 11
+    is_dir = 12
 
     get_all_storage_ips = 12
     init_new_storage = 13

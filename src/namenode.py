@@ -181,7 +181,6 @@ while True:
             source = con.recv(1024).decode('utf-8')
             con.send(random_address().encode('utf-8'))
 
-
         elif code == Codes.upload:  # upload
             filename = con.recv(1024).decode('utf-8')
             con.send('ok'.encode('utf-8'))
@@ -247,4 +246,11 @@ while True:
             else:
                 con.send(str(0).encode('utf-8'))
                 logger.print_debug_info('validate path send 0')
+        elif code == Codes.is_dir:
+            filepath = con.recv(1024).decode('utf-8')
+            res = tree.find_node(filepath).is_dir
+
+            con.send(str(int(res)).encode('utf-8'))
+            logger.print_debug_info("is_dir send {}".format(int(res)))
+
         con.close()

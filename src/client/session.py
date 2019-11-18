@@ -135,6 +135,13 @@ class Session:
 
     @staticmethod
     @logger.log
+    def is_dir(path):
+        sock = Session.send_command(Codes.is_dir, path)
+        res = int(sock.recv(1024).decode('utf-8'))
+        return res
+
+    @staticmethod
+    @logger.log
     def handle_upload(command, args):
         assert len(args) == 2
         if not os.path.isfile(args[0]):
@@ -196,7 +203,7 @@ class Session:
         # Send command to the namenode, send arguments and return socket
         sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         sock.connect((Constants.NAMENODE_IP, Constants.CLIENT_TO_NAMENODE))
-        sock.send(str(command.code).encode('utf-8'))
+        sock.send(repr(command).encode('utf-8'))
 
         for arg in args:
             sock.recv(1024)
