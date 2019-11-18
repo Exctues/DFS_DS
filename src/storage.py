@@ -186,7 +186,7 @@ def main():
     sock_storage.listen()
     Thread(target=waiter, args=(sock_storage, False)).start()
 
-    ping_listener()
+    # ping_listener()
     init_sync()
 
 
