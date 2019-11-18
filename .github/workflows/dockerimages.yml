@@ -16,8 +16,9 @@ jobs:
       env:
         version: 3.2
         user: danieldv99
+        password: 7d77a037-f741-4089-90ce-793247981f87
       run: |
-        docker login --username $user --password 7d77a037-f741-4089-90ce-793247981f87
+        docker login --username $user --password $password
 
         docker build -t=client:$version -f docker/client_dockerfile .
         docker build -t=namenode:$version -f docker/namenode_dockerfile .
