@@ -8,3 +8,5 @@ class Constants:
     # public ip for client
     NAMENODE_IP = '3.133.115.51'
     STORAGE_PATH = '/home/dfs_storage'
+
+    PING_TIMEOUT = 10

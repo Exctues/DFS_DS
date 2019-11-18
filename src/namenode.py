@@ -73,7 +73,7 @@ def random_address():
 def ping():
     def ping_thread():
         sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-        sock.settimeout(3)
+        sock.settimeout(Constants.PING_TIMEOUT)
         while True:
             for ip in clean_nodes.nodes.copy():
                 sent = sock.sendto('ping'.encode('utf-8'), (ip, Constants.NAMENODE_TO_STORAGE))
