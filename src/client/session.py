@@ -158,7 +158,7 @@ class Session:
         with open(args[0], 'rb') as host_file:
 
             with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as sock:
-                sock.connect((ip, Constants.STORAGE_PORT))
+                sock.connect((ip, Constants.NAMENODE_TO_STORAGE))
                 sock.send(str(command.code).encode('utf-8'))
                 #ack
                 sock.recv(1024)
@@ -184,7 +184,7 @@ class Session:
         sock.close()
 
         with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as sock:
-            sock.connect((ip, Constants.STORAGE_PORT))
+            sock.connect((ip, Constants.NAMENODE_TO_STORAGE))
             sock.send(source.encode('utf-8'))
             res = ""
 

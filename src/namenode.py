@@ -59,7 +59,7 @@ def multicast(cmd, arg1='', arg2=''):
         pass
 
     for ip in clean_nodes.nodes:
-        thread = Thread(target=send_args, args=[ip, Constants.STORAGE_PORT, cmd, arg1, arg2])
+        thread = Thread(target=send_args, args=[ip, Constants.NAMENODE_TO_STORAGE, cmd, arg1, arg2])
         thread.start()
 
 
@@ -76,7 +76,7 @@ def ping():
         sock.settimeout(3)
         while True:
             for ip in clean_nodes.nodes.copy():
-                sent = sock.sendto('ping'.encode('utf-8'), (ip, Constants.STORAGE_PORT))
+                sent = sock.sendto('ping'.encode('utf-8'), (ip, Constants.NAMENODE_TO_STORAGE))
                 try:
                     response, storagenode_addr = sock.recvfrom(1024)
                 except socket.timeout:
