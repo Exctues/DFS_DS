@@ -5,5 +5,3 @@ ENV PYTHONUNBUFFERED=1
 COPY src/client client
 COPY src/utils utils
 COPY src/client.py client.py
-
-ENTRYPOINT "/bin/sh"

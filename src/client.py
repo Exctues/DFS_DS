@@ -48,9 +48,14 @@ def setup_argparse():
 
 def interactive_loop(parser: argparse.ArgumentParser):
     while True:
-        curr_command = input("> ").strip().split()
-        if curr_command:
-            parser.parse_args(curr_command)
+        try:
+            curr_command = input("> ").strip().split()
+        except ValueError:
+            # Execution thread exited and closed stdin stream byt the main thread is still alive
+            exit(0)
+        finally:
+            if curr_command:
+                parser.parse_args(curr_command)
 
 
 def check_connection():

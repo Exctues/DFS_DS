@@ -128,9 +128,10 @@ class Session:
         sock = Session.send_command(command, *args, close_socket=False)
         l = sock.recv(1024).decode('utf-8')
         l = l.split(parameters.path_sep)
-        logger.print_info('\n'.join(l))
         # sock.shutdown(0)
         sock.close()
+
+        return l
 
     @staticmethod
     @logger.log

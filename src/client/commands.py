@@ -174,7 +174,8 @@ class CommandConfig:
             if not args[0]:
                 return
 
-            session.handle_ls(Commands.ls, args)
+            res = session.handle_ls(Commands.ls, args)
+            logger.print_info('\n'.join(res))
 
         @staticmethod
         def make_dir(session, args):
