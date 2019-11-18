@@ -4,8 +4,9 @@ networks:
 
 services:
   namenode:
-    image: concrete13377/namenode:3.1
+    image: danieldv99/namenode:3.1
     deploy:
+      mode: global
       placement:
         constraints:
           - node.role == manager
@@ -21,7 +22,7 @@ services:
 
 
   storage:
-    image: concrete13377/storage:3.1
+    image: danieldv99/storage:3.1
     deploy:
       replicas: 3
       placement:
@@ -36,3 +37,11 @@ services:
     networks:
       - mynetwork
 
+  client:
+    image: danieldv99/client:3.1
+    deploy:
+      mode: global
+
+    depends_on:
+      - "namenode"
+      - "storage"
