@@ -167,12 +167,14 @@ def waiter(sock: socket.socket, is_namenode):
     if is_namenode:
         NamenodeListener(sock).start()
     else:
-        logger.print_debug_info("This is Client(or Storage) connection", addr)
+        logger.print_debug_info("This is Storage connection", addr)
         StorageListener(sock, addr).start()
 
 
 @logger.log
 def main():
+    # ping_listener()
+    init_sync()
     # Create socket to communicate with namenode
     sock_namenode = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     sock_namenode.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
@@ -187,8 +189,7 @@ def main():
     sock_storage.listen()
     Thread(target=waiter, args=(sock_storage, False)).start()
 
-    # ping_listener()
-    init_sync()
+
 
 
 if __name__ == '__main__':
