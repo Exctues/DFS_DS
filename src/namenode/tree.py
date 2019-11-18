@@ -135,6 +135,12 @@ class FSTree:
             self.__size = size
             self.is_dir = False
 
+        def erase(self):
+            if self.name == '.' or self.name == '..':
+                return False
+
+            return super().erase()
+
         @property
         def size(self):
             return self.__size
@@ -143,17 +149,11 @@ class FSTree:
             # return str(self.get_path())+' ('+str(self.size)+' bytes)'
             return "{} ({} bytes)".format(self.get_path(), self.size)
 
-    class __RootNode(FSNode):
+    class __RootNode(DirNode):
         def __init__(self):
             super().__init__('/', None)
 
         def get_path(self):
-            return '/'
-
-        def __repr__(self):
-            return '/'
-
-        def __str__(self):
             return '/'
 
         def erase(self):
@@ -162,3 +162,13 @@ class FSTree:
 
             self.children = []
             return True
+
+        def __add_default_dirs(self):
+            self.children['..'] = self
+            self.children['.'] = self
+
+        def __repr__(self):
+            return '/'
+
+        def __str__(self):
+            return '/'
