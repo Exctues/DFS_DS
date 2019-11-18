@@ -106,7 +106,7 @@ def ping_listener():
 @logger.log
 def get_sync_storage_ip():
     sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-    sock.connect((Constants.NAMENODE_IP, Constants.NEW_NODES_PORT))
+    sock.connect((Constants.NAMENODE_ADDRESS, Constants.NEW_NODES_PORT))
     sock.send(str(Codes.init_new_storage).encode('utf-8'))
     sock.recv(1024)
     sock.send(socket.gethostname().encode('utf-8'))
