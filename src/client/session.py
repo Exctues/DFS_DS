@@ -151,27 +151,17 @@ class Session:
         size = str(os.path.getsize(args[0]))
 
         sock = Session.send_command(command, args[1], size, close_socket=False)
-        ip = sock.recv(1024).decode('utf-8')
-        # sock.shutdown(0)
-        sock.close()
+        sock.recv(1024)
 
         with open(args[0], 'rb') as host_file:
+            #ack
+            data = host_file.read(1024)
 
-            with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as sock:
-                sock.connect((ip, Constants.NAMENODE_TO_STORAGE))
-                sock.send(str(command.code).encode('utf-8'))
-                #ack
-                sock.recv(1024)
-                sock.send((args[1] + ';1').encode('utf-8'))
-
+            while data:
+                sock.send(data)
                 data = host_file.read(1024)
 
-                while data:
-                    sock.send(data)
-                    sock.recv(1)
-                    data = host_file.read(1024)
-
-                sock.close()
+            sock.close()
         
         logger.print_info(data)
 
@@ -179,21 +169,17 @@ class Session:
     @logger.log
     def handle_print(command, source):
         sock = Session.send_command(command, source, close_socket=False)
-        ip = sock.recv(1024).decode('utf-8')
         # sock.shutdown(0)
-        sock.close()
 
-        with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as sock:
-            sock.connect((ip, Constants.NAMENODE_TO_STORAGE))
-            sock.send(source.encode('utf-8'))
-            res = ""
+        sock.send(source.encode('utf-8'))
+        res = ""
 
+        data = sock.recv(1024).decode('utf-8')
+        while data:
+            res += data
             data = sock.recv(1024)
-            while data:
-                res += data.decode('utf-8')
-                sock.send('ok'.encode('utf-8'))
-                
-                data = sock.recv(1024)
+
+        sock.close()
 
         logger.print_info(data)
 
