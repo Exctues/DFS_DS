@@ -1,4 +1,6 @@
 # N cmd data
+import time
+
 from namenode.tree import FSTree
 from utils.constants import Constants
 from utils.codes import Codes
@@ -66,21 +68,27 @@ def random_ip():
     return random.sample(clean_nodes.nodes, 1)[0]
 
 
-# TODO: GOOD PING
-# thread that pings nodes and modify storage_nodes
-# @logger.log
-# def ping():
-#     def ping_thread():
-#         while True:
-#             for ip in clean_nodes.nodes.copy():
-#                 response = os.system("ping -c 1 " + ip)
-#                 if response != 0:
-#                     with clean_nodes.lock:
-#                         clean_nodes.nodes.discard(ip)
-#             time.sleep(30)
-#
-#     heartbeat = Thread(target=ping_thread)
-#     heartbeat.start()
+# thread that pings nodes and modify storage_nodes.nodes
+@logger.log
+def ping():
+    def ping_thread():
+        sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+        sock.settimeout(3)
+        while True:
+            for ip in clean_nodes.nodes.copy():
+                sent = sock.sendto('ping'.encode('utf-8'), (ip, Constants.STORAGE_PORT))
+                try:
+                    response, storagenode_addr = sock.recvfrom(1024)
+                except socket.timeout:
+                    with clean_nodes.lock:
+                        clean_nodes.nodes.discard(ip)
+                    logger.print_debug_info('timeout storagenode', ip)
+                except Exception as e:
+                    logger.print_debug_info('exception during ping' + str(e))
+            time.sleep(10)
+
+    heartbeat = Thread(target=ping_thread)
+    heartbeat.start()
 
 
 # thread that listens and add new storage nodes
@@ -136,7 +144,7 @@ def new_nodes_listener():
     new_nodes_listener.start()
 
 
-# ping()
+ping()
 new_nodes_listener()
 
 tree = FSTree()
