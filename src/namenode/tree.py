@@ -141,6 +141,9 @@ class FSTree:
 
             return super().erase()
 
+        def get_children(self):
+            return self.get_path()
+
         @property
         def size(self):
             return self.__size
