@@ -157,7 +157,12 @@ class CommandConfig:
         @staticmethod
         def cd(session, args):
             new_path = session.resolve_full_path(args[0])
+            is_dir = session.is_dir(new_path)
             if not new_path:
+                return
+
+            if not is_dir:
+                logger.handle_error("Not a directory!")
                 return
 
             session.change_curr_dir(new_path)
