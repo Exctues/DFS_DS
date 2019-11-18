@@ -42,9 +42,8 @@ class CommandHandler:
         # to properly join
         full_path = full_path.strip(os.sep)
         # receiving file from a client
-        logger.print_debug_info("Sending", full_path)
+        logger.print_debug_info("Receiving", full_path)
         with open(os.path.join(Constants.STORAGE_PATH, full_path), 'wb+') as file:
-            data = socket.recv(1024)
             while data:
                 data = socket.recv(1024)
                 if data:
@@ -52,12 +51,15 @@ class CommandHandler:
                     socket.send('1'.encode('utf-8'))
                 else:
                     return
+            data = socket.recv(1024)
 
     @staticmethod
     @logger.log
     def handle_print_to(socket: socket.socket, full_path):
+        # to properly join
+        full_path = full_path.strip(os.sep)
         # sending file to a client
-        logger.print_debug_info("Receiving", full_path)
+        logger.print_debug_info("Sending", full_path)
         with open(os.path.join(Constants.STORAGE_PATH, full_path), 'rb') as file:
             data = file.read(1024)
             while data:
