@@ -64,7 +64,7 @@ def multicast(cmd, arg1='', arg2=''):
 
 
 @logger.log
-def random_ip():
+def random_address():
     return random.sample(clean_nodes.nodes, 1)[0]
 
 
@@ -111,23 +111,23 @@ def new_nodes_listener():
             storagename = con.recv(1024).decode('utf-8')
 
             if code == Codes.i_clear:
-                logger.print_debug_info("Node {} says it's clean".format(addr))
+                logger.print_debug_info("Node {} says it's clean".format(storagename))
                 dirty_nodes.nodes.discard(storagename)
                 clean_nodes.nodes.add(storagename)
 
             elif code == Codes.init_new_storage:
                 if len(clean_nodes.nodes) > 0:
                     dirty_nodes.nodes.add(storagename)
-                    copy_from = random_ip()
+                    copy_from = random_address()
                     con.send(copy_from.encode('utf-8'))
                     logger.print_debug_info("New storage node {} connected "
-                                            "and will copy from {}".format(addr, copy_from))
+                                            "and will copy from {}".format(storagename, copy_from))
                 else:
                     # sanity check
                     assert len(dirty_nodes.nodes) == 0
                     con.send('-1'.encode('utf-8'))
                     clean_nodes.nodes.add(storagename)
-                    logger.print_debug_info("New storage node {} connected and, system init".format(addr))
+                    logger.print_debug_info("New storage node {} connected, system init".format(storagename))
 
             elif code == Codes.get_all_storage_ips:
                 if len(clean_nodes.nodes) > 0:
@@ -136,7 +136,7 @@ def new_nodes_listener():
                     res = '-1'
 
                 con.send(res.encode('utf-8'))
-                logger.print_debug_info("Node {} requested ip list. Sending {}".format(addr, res))
+                logger.print_debug_info("Node {} requested ip list. Sending {}".format(storagename, res))
 
             con.close()
 
@@ -179,7 +179,7 @@ while True:
 
         elif code == Codes.print:  # print # download
             source = con.recv(1024).decode('utf-8')
-            con.send(random_ip().encode('utf-8'))
+            con.send(random_address().encode('utf-8'))
 
 
         elif code == Codes.upload:  # upload
@@ -187,7 +187,7 @@ while True:
             con.send('ok'.encode('utf-8'))
             size = int(con.recv(1024).decode('utf-8'))
             tree.insert(filename, size)
-            con.send(random_ip().encode('utf-8'))
+            con.send(random_address().encode('utf-8'))
 
         elif code == Codes.rm:  # rm
             filename = con.recv(1024).decode('utf-8')

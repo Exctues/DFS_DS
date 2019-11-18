@@ -1,0 +1,33 @@
+name: Docker Build and Push
+
+on:
+  push:
+    branches: master
+
+jobs:
+
+  build:
+
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v1
+    - name: Build the Docker image
+      env:
+        version: 3.2
+        user: danieldv99
+      run: |
+        docker login --username $user --password 7d77a037-f741-4089-90ce-793247981f87
+
+        docker build -t=client:$version -f docker/client_dockerfile .
+        docker build -t=namenode:$version -f docker/namenode_dockerfile .
+        docker build -t=storage:$version -f docker/storage_dockerfile .
+
+        docker tag client:$version $user/client:$version
+        docker push $user/client:$version
+
+        docker tag namenode:$version $user/namenode:$version
+        docker push $user/namenode:$version
+
+        docker tag storage:$version $user/storage:$version
+        docker push $user/storage:$version
