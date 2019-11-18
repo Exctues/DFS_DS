@@ -4,7 +4,7 @@ class Constants:
     NEW_NODES_PORT = 1337  # port where new storage nodes knock
     CLIENT_TO_NAMENODE = 322
     STORAGE_TO_STORAGE = 777
-    NAMENODE_ADDRESS = '3.133.115.51'  # gfs1
+    NAMENODE_ADDRESS = 'mydfs_namenode'  # gfs1
     # public ip for client
     NAMENODE_IP = '3.133.115.51'
     STORAGE_PATH = '/home/dfs_storage'
