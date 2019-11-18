@@ -44,14 +44,13 @@ class CommandHandler:
         # receiving file from a client
         logger.print_debug_info("Receiving", full_path)
         with open(os.path.join(Constants.STORAGE_PATH, full_path), 'wb+') as file:
-            while data:
+            while True:
                 data = socket.recv(1024)
                 if data:
                     file.write(data)
                     socket.send('1'.encode('utf-8'))
                 else:
                     return
-            data = socket.recv(1024)
 
     @staticmethod
     @logger.log
