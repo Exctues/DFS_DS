@@ -136,7 +136,7 @@ class Session:
     @staticmethod
     @logger.log
     def is_dir(path):
-        sock = Session.send_command(Codes.is_dir, path)
+        sock = Session.send_command(Codes.is_dir, path, close_socket=False)
         res = int(sock.recv(1024).decode('utf-8'))
         return res
 
