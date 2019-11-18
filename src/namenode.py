@@ -156,7 +156,6 @@ while True:
     soc.bind(('', Constants.CLIENT_TO_NAMENODE))
     soc.listen()
     while True:
-
         con, addr = soc.accept()  # addr is a tuple
         logger.print_debug_info('new client connection')
 
@@ -179,14 +178,31 @@ while True:
 
         elif code == Codes.print:  # print # download
             source = con.recv(1024).decode('utf-8')
-            con.send(random_address().encode('utf-8'))
+
+            storage_sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+            storage_sock.connect((random_address(), Constants.STORAGE_PORT))
 
         elif code == Codes.upload:  # upload
             filename = con.recv(1024).decode('utf-8')
             con.send('ok'.encode('utf-8'))
             size = int(con.recv(1024).decode('utf-8'))
+            con.send('ok'.encode('utf-8'))
+
+            storage_sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+            storage_sock.connect((random_address(), Constants.STORAGE_PORT))
+
+            data = con.recv(1024)
+            storage_sock.send('ok'.encode('utf-8'))
+
+            while data:
+                if data:
+                    storage_sock.send(data)
+                    storage_sock.send('ok'.encode('utf-8'))
+
+                data = con.recv(1024)
+
             tree.insert(filename, size)
-            con.send(random_address().encode('utf-8'))
+            storage_sock.close()
 
         elif code == Codes.rm:  # rm
             filename = con.recv(1024).decode('utf-8')
