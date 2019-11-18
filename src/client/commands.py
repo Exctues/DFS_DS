@@ -186,9 +186,17 @@ class CommandConfig:
 
         @staticmethod
         def rmdir(session, args):
+            # validate and build paths
             args = list(map(session.resolve_full_path, args))
             if not all(args):
                 return
+
+            is_dir = list(map(session.is_dir, args))
+            if not all(is_dir):
+                idx = is_dir.index(0)
+                logger.handle_error("Path {} is not a directory!".format(args[idx]))
+                return
+
             CommandConfig.Actions.__n_args_handler(session.send_command, Commands.rmdir, args)
 
         @staticmethod
