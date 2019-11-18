@@ -6,4 +6,4 @@ COPY src/client client
 COPY src/utils utils
 COPY src/client.py client.py
 
-CMD ["python3","client.py"]
+CMD "/bin/bash"

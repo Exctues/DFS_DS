@@ -37,11 +37,11 @@ services:
     networks:
       - mynetwork
 
-  client:
-    image: danieldv99/client:3.1
-    deploy:
-      mode: global
-
-    depends_on:
-      - "namenode"
-      - "storage"
+#  client:
+#    image: danieldv99/client:3.1
+#    deploy:
+#      mode: global
+#
+#    depends_on:
+#      - "namenode"
+#      - "storage"
