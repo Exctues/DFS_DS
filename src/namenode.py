@@ -75,6 +75,7 @@ def ping():
         sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
         sock.settimeout(Constants.PING_TIMEOUT)
         while True:
+            time.sleep(10)
             for ip in clean_nodes.nodes.copy():
                 sent = sock.sendto('ping'.encode('utf-8'), (ip, Constants.NAMENODE_TO_STORAGE))
                 try:
@@ -85,7 +86,6 @@ def ping():
                     logger.print_debug_info('timeout storagenode', ip)
                 except Exception as e:
                     logger.print_debug_info('exception during ping' + str(e))
-            time.sleep(10)
 
     heartbeat = Thread(target=ping_thread)
     heartbeat.start()
