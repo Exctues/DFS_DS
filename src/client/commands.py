@@ -121,9 +121,10 @@ class CommandConfig:
         def upload(session, args):
             if len(args) == 1:
                 file_name = args[0].split(parameters.sep)[-1]
-                file_path = session.resolve_partial_path(file_name)
 
-                args.append(file_path)
+                args.append(file_name)
+
+            args[1] = session.resolve_partial_path(args[1])
 
             if not args[1]:
                 return
