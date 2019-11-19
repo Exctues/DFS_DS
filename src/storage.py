@@ -163,12 +163,13 @@ def init_sync():
 
 def waiter(sock: socket.socket, is_namenode):
     logger.print_debug_info("Wait on accept.", "is_namenode = ", is_namenode)
-    socket, addr = sock.accept()
-    if is_namenode:
-        NamenodeListener(socket).start()
-    else:
-        logger.print_debug_info("This is Storage connection", addr)
-        StorageListener(socket, addr).start()
+    while True:
+        socket, addr = sock.accept()
+        if is_namenode:
+            NamenodeListener(socket).start()
+        else:
+            logger.print_debug_info("This is Storage connection", addr)
+            StorageListener(socket, addr).start()
 
 
 @logger.log
