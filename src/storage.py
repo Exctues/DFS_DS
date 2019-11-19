@@ -15,6 +15,7 @@ class NamenodeListener(Thread):
 
     def run(self):
         code = int(self.sock.recv(4).decode('utf-8'))
+        logger.print_debug_info("AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAa")
         self.sock.send('ok'.encode('utf-8'))
         logger.print_debug_info(code)
 
@@ -46,11 +47,11 @@ class NamenodeListener(Thread):
             # then create this dir empty
             os.makedirs(Constants.STORAGE_PATH)
         elif code == Codes.upload:
-            logger.log("hey")
+            logger.print_debug_info("hey")
             full_path = self.sock.recv(1024).decode('utf-8')
             self.sock.send('ok'.encode('utf-8'))
             CommandHandler.handle_upload_from(self.sock, full_path)
-            logger.log("hey2")
+            logger.print_debug_info("hey2")
 
             CommandHandler.distribute(full_path)
             logger.log("he3")
@@ -81,7 +82,7 @@ class StorageListener(Thread):
         elif code == Codes.upload:
             full_path = self.sock.recv(1024).decode('utf-8')
             self.sock.send('ok'.encode('utf-8'))
-            logger.print_info("not right handle")
+            logger.print_debug_info("not right handle")
             CommandHandler.handle_upload_from(self.sock, full_path)
         elif code == Codes.download_all:
             CommandHandler.handle_download_all(self.address[0])
