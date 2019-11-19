@@ -15,7 +15,6 @@ class NamenodeListener(Thread):
 
     def run(self):
         code = int(self.sock.recv(4).decode('utf-8'))
-        logger.print_debug_info("AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAa")
         self.sock.send('ok'.encode('utf-8'))
         logger.print_debug_info(code)
 
@@ -85,6 +84,9 @@ class StorageListener(Thread):
             CommandHandler.handle_upload_from(self.sock, full_path)
         elif code == Codes.download_all:
             CommandHandler.handle_download_all(self.address[0])
+        elif code == Codes.make_dir:
+            full_path = self.sock.recv(1024).decode('utf-8')
+            CommandHandler.handle_mkdir(full_path)
         else:
             print("StorageListener: no command correspond to code", code)
         # regarding shutdown:
