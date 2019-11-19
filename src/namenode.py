@@ -176,7 +176,7 @@ while True:
             multicast(Codes.make_file, filepath)
             logger.print_debug_info('makefile success')
 
-        elif code == Codes.print:  # print # download
+        elif code == Codes.print:  # download
             source = con.recv(1024).decode('utf-8')
             while len(dirty_nodes.nodes) > 0:
                 pass
@@ -229,6 +229,7 @@ while True:
             con.send(node.name.encode('utf-8'))
             # ack
             a = con.recv(1024).decode('utf-8')
+            print("Size in info:", node.size)
             con.send(str(node.size).encode('utf-8'))
 
         elif code == Codes.copy:  # copy

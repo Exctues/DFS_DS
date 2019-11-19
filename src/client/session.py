@@ -112,12 +112,15 @@ class Session:
     @staticmethod
     @logger.log
     def handle_info(command, args):
-        sock = Session.send_command(command, args, close_socket=False)
+        sock = Session.send_command(command, *args, close_socket=False)
         filename = sock.recv(1024).decode('utf-8')
         # ack
-        sock.send('ok'.encode('utf-8'))
+        sock.send('k'.encode('utf-8'))
         size = sock.recv(1024).decode('utf-8')
-        logger.print_info("{}\t{} bytes".format(filename, size))
+        if size != '-1':
+            logger.print_info("{}\t{} bytes".format(filename, size))
+        else:
+            logger.print_info("{}\tdir".format(filename))
 
         # sock.shutdown(0)
         sock.close()
