@@ -160,6 +160,8 @@ class CommandHandler:
             ips = None
         else:
             ips = ips.split(';')
+            my_name = socket.gethostname()
+            ips.remove(my_name)
         return ips
 
     @staticmethod
