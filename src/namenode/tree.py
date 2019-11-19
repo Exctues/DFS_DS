@@ -72,7 +72,6 @@ class FSTree:
         def __init__(self, name, parent):
             self.children = {}
             self.__name = name.strip('/')
-            self.__size = -1
             self.parent = parent
             self.is_dir = True
 
@@ -85,7 +84,7 @@ class FSTree:
 
         @property
         def size(self):
-            return self.__size
+            return -1
 
         def get_path(self) -> str:
             if self.parent is None:
@@ -139,6 +138,10 @@ class FSTree:
             self.ip_pool = ip_addresses_pool
             self.__size = size
             self.is_dir = False
+
+        @property
+        def size(self):
+            return self.__size
 
         def erase(self):
             if self.name == '.' or self.name == '..':
