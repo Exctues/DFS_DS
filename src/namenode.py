@@ -235,7 +235,8 @@ while True:
             source = con.recv(1024).decode('utf-8')
             con.send('ok'.encode('utf-8'))
             destination = con.recv(1024).decode('utf-8')
-            tree.insert(destination)
+            node = tree.find_node(source)
+            tree.insert(destination, node.size)
             multicast(Codes.copy, source, destination)
 
         elif code == Codes.move:  # move
