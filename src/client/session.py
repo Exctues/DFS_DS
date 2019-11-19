@@ -163,7 +163,7 @@ class Session:
 
             sock.close()
         
-        logger.print_info(data)
+        # logger.print_info(data)
 
     @staticmethod
     @logger.log
