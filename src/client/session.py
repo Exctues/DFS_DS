@@ -130,6 +130,7 @@ class Session:
     def handle_ls(command, args):
         sock = Session.send_command(command, *args, close_socket=False)
         l = sock.recv(1024).decode('utf-8')
+        print(l)
         l = l.split(parameters.path_sep)
         # sock.shutdown(0)
         sock.close()

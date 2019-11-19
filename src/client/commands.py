@@ -192,7 +192,10 @@ class CommandConfig:
                 return
 
             res = session.handle_ls(Commands.ls, args)
-            logger.print_info('\n'.join(res))
+            if res is str:
+                logger.print_info(res)
+            else:
+                logger.print_info('\n'.join(res))
 
         @staticmethod
         def make_dir(session, args):
@@ -215,11 +218,11 @@ class CommandConfig:
                 return
 
             for dir in args:
-                children = session.handle_ls(dir)
+                children = session.handle_ls(Commands.ls, [dir])
 
-                if len(children):
-                    logger.print_info("Directory is not empty. Do you want to remove it with all its contents?\n"
-                                      "Print \"yes\" to proceed, or anything else to abort operation.")
+                if len(children) > 2:
+                    logger.print_info("Directory {} is not empty. Do you want to remove it with all its contents?\n"
+                                      "Print \"yes\" to proceed, or anything else to abort operation.".format(dir))
                     response = input()
                     if response.strip(" ") != "yes":
                         return

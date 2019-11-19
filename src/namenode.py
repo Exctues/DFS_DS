@@ -250,8 +250,13 @@ while True:
 
         elif code == Codes.ls:  # ls
             source = con.recv(1024).decode('utf-8')
-            children = tree.find_node(source).get_children()
-            child_str = ';'.join(children)
+            node = tree.find_node(source)
+            children = node.get_children()
+
+            if not node.is_dir:
+                child_str = children
+            else:
+                child_str = ';'.join(children)
             con.send(child_str.encode('utf-8'))
 
         elif code == Codes.make_dir:  # make_dir
