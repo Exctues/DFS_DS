@@ -6,7 +6,8 @@ class Constants:
     STORAGE_TO_STORAGE = 777
     NAMENODE_ADDRESS = 'mydfs_namenode'  # gfs1
     # public ip for client
-    NAMENODE_IP = '3.133.115.51'
-    STORAGE_PATH = '/var/dfs_storage'
+    NAMENODE_IP = '3.133.143.63'
+
+    STORAGE_PATH = '/home/dfs_storage'
 
     PING_TIMEOUT = 10
