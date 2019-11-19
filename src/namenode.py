@@ -178,6 +178,8 @@ while True:
 
         elif code == Codes.print:  # print # download
             source = con.recv(1024).decode('utf-8')
+            while len(dirty_nodes.nodes) > 0:
+                pass
 
             storage_sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
             storage_sock.connect((random_address(), Constants.NAMENODE_TO_STORAGE))
@@ -197,6 +199,9 @@ while True:
             con.send('ok'.encode('utf-8'))
             size = int(con.recv(1024).decode('utf-8'))
             con.send('ok'.encode('utf-8'))
+
+            while len(dirty_nodes.nodes) > 0:
+                pass
 
             storage_sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
             storage_sock.connect((random_address(), Constants.NAMENODE_TO_STORAGE))
