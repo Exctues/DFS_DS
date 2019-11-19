@@ -198,7 +198,6 @@ while True:
             filename = con.recv(1024).decode('utf-8')
             con.send('ok'.encode('utf-8'))
             size = int(con.recv(1024).decode('utf-8'))
-            logger.print_debug_info("Size received in upload:", size)
             con.send('ok'.encode('utf-8'))
 
             while len(dirty_nodes.nodes) > 0:
@@ -216,7 +215,7 @@ while True:
                 if data:
                     storage_sock.send(data)
                 data = con.recv(1024)
-            tree.insert(filename, size)
+            tree.insert(filename, size=size)
             storage_sock.close()
 
         elif code == Codes.rm:  # rm
