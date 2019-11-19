@@ -178,7 +178,7 @@ def main():
     sock_storage.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
     sock_storage.bind(('', Constants.STORAGE_TO_STORAGE))
     sock_storage.listen()
-    Thread(target=waiter, args=(sock_storage, False)).start()
+    a = Thread(target=waiter, args=(sock_storage, False))
     # ping_listener()
     init_sync()
     # Create socket to communicate with namenode
@@ -186,7 +186,11 @@ def main():
     sock_namenode.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
     sock_namenode.bind(('', Constants.NAMENODE_TO_STORAGE))
     sock_namenode.listen()
-    Thread(target=waiter, args=(sock_namenode, True)).start()
+    b = Thread(target=waiter, args=(sock_namenode, True))
+    a.start()
+    b.start()
+    a.join()
+    b.join()
 
 
 if __name__ == '__main__':
