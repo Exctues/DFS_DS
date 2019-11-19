@@ -113,7 +113,7 @@ class CommandConfig:
 
             is_dir = session.is_dir(source)
             if is_dir:
-                print("{} is not a file!".format(args[0]))
+                logger.handle_error("{} is not a file!".format(args[0]))
                 return
             session.handle_print(Commands.print, source)
 

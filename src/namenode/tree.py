@@ -72,6 +72,7 @@ class FSTree:
         def __init__(self, name, parent):
             self.children = {}
             self.__name = name.strip('/')
+            self.__size = -1
             self.parent = parent
             self.is_dir = True
 
@@ -81,6 +82,10 @@ class FSTree:
         @property
         def name(self):
             return self.__name
+
+        @property
+        def size(self):
+            return self.__size
 
         def get_path(self) -> str:
             if self.parent is None:
@@ -143,10 +148,6 @@ class FSTree:
 
         def get_children(self):
             return self.get_path()
-
-        @property
-        def size(self):
-            return self.__size
 
         def __str__(self):
             # return str(self.get_path())+' ('+str(self.size)+' bytes)'
