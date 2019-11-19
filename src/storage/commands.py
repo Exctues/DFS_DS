@@ -126,7 +126,7 @@ class CommandHandler:
     def handle_mkdir(full_path: str):
         # to properly join
         full_path = full_path.strip(os.sep)
-        os.makedirs(os.path.join(Constants.STORAGE_PATH, full_path), exist_ok=True)
+        os.system("mkdir -p {}".format(os.path.join(Constants.STORAGE_PATH, full_path)))
 
     @staticmethod
     @logger.log
