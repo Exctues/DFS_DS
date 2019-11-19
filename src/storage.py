@@ -81,6 +81,7 @@ class StorageListener(Thread):
         elif code == Codes.upload:
             full_path = self.sock.recv(1024).decode('utf-8')
             self.sock.send('ok'.encode('utf-8'))
+            logger.print_info("not right handle")
             CommandHandler.handle_upload_from(self.sock, full_path)
         elif code == Codes.download_all:
             CommandHandler.handle_download_all(self.address[0])
