@@ -81,11 +81,11 @@ class CommandHandler:
             sock.recv(1024)  # ack
             if code == Codes.upload:
                 # we need off distribution on upload
-                sock.send(full_path + ' 0')
+                sock.send(full_path.encode('utf-8'))
                 sock.recv(1024)
                 CommandHandler.handle_print_to(sock, full_path)
             else:
-                sock.send(full_path)
+                sock.send(full_path.encode('utf-8'))
             sock.close()
 
         # for all files
