@@ -43,11 +43,12 @@ class NamenodeListener(Thread):
         elif code == Codes.init:
             if os.path.exists(Constants.STORAGE_PATH):
                 try:
-                    os.removedirs(Constants.STORAGE_PATH)
+                    # os.removedirs(Constants.STORAGE_PATH)
+                    os.system("sudo rm -rf {}".format(Constants.STORAGE_PATH))
+                    os.makedirs(Constants.STORAGE_PATH, exist_ok=True)
                 except:
                     logger.handle_error("rmdirs failed")
             # then create this dir empty
-            os.makedirs(Constants.STORAGE_PATH, exist_ok=True)
         elif code == Codes.upload:
             logger.print_debug_info("hey")
             full_path = self.sock.recv(1024).decode('utf-8')
@@ -140,12 +141,13 @@ def notify_i_clear():
 def recreate_storage_dirs():
     if os.path.exists(Constants.STORAGE_PATH):
         try:
-            os.removedirs(Constants.STORAGE_PATH)
+            # os.removedirs(Constants.STORAGE_PATH)
+            os.system("sudo rm -rf {}".format(Constants.STORAGE_PATH))
+            os.makedirs(Constants.STORAGE_PATH, exist_ok=True)
         except:
             logger.handle_error("removedirs fail")
         logger.print_debug_info(Constants.STORAGE_PATH, "removed")
         # then create this dir empty
-    os.makedirs(Constants.STORAGE_PATH, exist_ok=True)
     logger.print_debug_info(Constants.STORAGE_PATH, "(re)created")
 
 
