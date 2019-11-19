@@ -45,9 +45,10 @@ class NamenodeListener(Thread):
                 try:
                     # os.removedirs(Constants.STORAGE_PATH)
                     os.system("rm -rf {}/*".format(Constants.STORAGE_PATH))
-                    os.system("mkdir -p {}".format(Constants.STORAGE_PATH))
                 except:
                     logger.handle_error("rmdirs failed")
+
+                os.system("mkdir -p {}".format(Constants.STORAGE_PATH))
             # then create this dir empty
         elif code == Codes.upload:
             logger.print_debug_info("hey")
@@ -143,9 +144,10 @@ def recreate_storage_dirs():
         try:
             # os.removedirs(Constants.STORAGE_PATH)
             os.system("rm -rf {}/*".format(Constants.STORAGE_PATH))
-            os.system("mkdir -p {}".format(Constants.STORAGE_PATH))
         except:
             logger.handle_error("removedirs fail")
+
+        os.system("mkdir -p {}".format(Constants.STORAGE_PATH))
         logger.print_debug_info(Constants.STORAGE_PATH, "removed")
         # then create this dir empty
     logger.print_debug_info(Constants.STORAGE_PATH, "(re)created")
