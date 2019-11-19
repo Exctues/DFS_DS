@@ -72,7 +72,7 @@ class StorageListener(Thread):
         self.address = address
 
     def run(self):
-        code = self.sock.recv(1024).decode('utf-8')
+        code = int(self.sock.recv(1024).decode('utf-8'))
         self.sock.send('ok'.encode('utf-8'))
         logger.print_debug_info(code)
 
@@ -86,7 +86,7 @@ class StorageListener(Thread):
         elif code == Codes.download_all:
             CommandHandler.handle_download_all(self.address[0])
         else:
-            print("ClientListener: no command correspond to code", code)
+            print("StorageListener: no command correspond to code", code)
         # regarding shutdown:
         # Shut down one or both halves of the connection.
         # If how is SHUT_RD,   further receives are disallowed.
