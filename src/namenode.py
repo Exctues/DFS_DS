@@ -198,6 +198,7 @@ while True:
             filename = con.recv(1024).decode('utf-8')
             con.send('ok'.encode('utf-8'))
             size = int(con.recv(1024).decode('utf-8'))
+            logger.print_debug_info("Size received in upload:", size)
             con.send('ok'.encode('utf-8'))
 
             while len(dirty_nodes.nodes) > 0:
@@ -229,7 +230,6 @@ while True:
             con.send(node.name.encode('utf-8'))
             # ack
             a = con.recv(1024).decode('utf-8')
-            print("Size in info:", node.size)
             con.send(str(node.size).encode('utf-8'))
 
         elif code == Codes.copy:  # copy
