@@ -144,7 +144,7 @@ class Session:
     @logger.log
     def handle_upload(command, args):
         assert len(args) == 2
-        if not os.path.isfile(args[0]):
+        if not os.path.exists(args[0]) or os.path.isdir(args[0]):
             logger.handle_error("Incorrect host path specified!")
             return
 
@@ -170,18 +170,24 @@ class Session:
     def handle_print(command, source):
         sock = Session.send_command(command, source, close_socket=False)
         # sock.shutdown(0)
+        download_full_path = os.path.join(os.getcwd(), parameters.download_path)
+        if not os.path.exists(download_full_path):
+            os.makedirs(download_full_path)
 
-        sock.send(source.encode('utf-8'))
-        res = ""
-
-        data = sock.recv(1024).decode('utf-8')
+        file_name = source.split(parameters.sep)[-1]
+        download_file_path = os.path.join(download_full_path, file_name)
+        res = b""
+        data = sock.recv(1024)
         while data:
             res += data
             data = sock.recv(1024)
 
+        with open(download_file_path, 'wb+') as host_file:
+            host_file.write(res)
+
         sock.close()
 
-        logger.print_info(data)
+        logger.print_info(res.decode('utf-8'))
 
     @staticmethod
     @logger.log

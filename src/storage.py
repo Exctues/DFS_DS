@@ -46,10 +46,14 @@ class NamenodeListener(Thread):
             # then create this dir empty
             os.makedirs(Constants.STORAGE_PATH)
         elif code == Codes.upload:
+            logger.log("hey")
             full_path = self.sock.recv(1024).decode('utf-8')
             self.sock.send('ok'.encode('utf-8'))
             CommandHandler.handle_upload_from(self.sock, full_path)
+            logger.log("hey2")
+
             CommandHandler.distribute(full_path)
+            logger.log("he3")
         elif code == Codes.print:
             full_path = self.sock.recv(1024).decode('utf-8')
             CommandHandler.handle_print_to(self.sock, full_path)
@@ -166,6 +170,7 @@ def waiter(sock: socket.socket, is_namenode):
     while True:
         socket, addr = sock.accept()
         if is_namenode:
+            logger.print_debug_info("This is Namenode connection", addr)
             NamenodeListener(socket).start()
         else:
             logger.print_debug_info("This is Storage connection", addr)
