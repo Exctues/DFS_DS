@@ -112,6 +112,8 @@ class CommandHandler:
             sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
             sock.connect((ip, Constants.STORAGE_TO_STORAGE))
             # Check if another storage doesn't have a file
+            sock.send(str(Codes.upload).encode('utf-8'))
+            sock.recv(1024)
             if not CommandHandler._has_file(sock, full_path):
                 logger.print_debug_info("Distributing", full_path)
                 sock.send(full_path.encode('utf-8'))
