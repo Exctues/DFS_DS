@@ -25,7 +25,7 @@ services:
   storage:
     image: danieldv99/storage:3.2
     deploy:
-      replicas: 3
+      replicas: 2
       placement:
         constraints:
           - node.role == worker

@@ -90,7 +90,13 @@ class CommandHandler:
 
         # for all files
         for dir_name, subdir_list, file_list in os.walk(Constants.STORAGE_PATH):
-            ask(Codes.make_dir, dir_name)
+            # ask(Codes.make_dir, dir_name)
+            print(dir_name)
+            for dir in subdir_list:
+                print(dir)
+
+            print()
+
             for file in file_list:
                 logger.print_debug_info("downloading all:", file)
                 sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
