@@ -88,7 +88,7 @@ class CommandHandler:
                 sock.send(full_path.encode('utf-8'))
             sock.close()
 
-        home_path_length = os.path.split(Constants.STORAGE_PATH)
+        home_path_length = len(os.path.split(Constants.STORAGE_PATH))
 
         # for all files
         for dir_name, subdir_list, file_list in os.walk(Constants.STORAGE_PATH):
