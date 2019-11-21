@@ -93,17 +93,20 @@ class CommandHandler:
         # for all files
         for dir_name, subdir_list, file_list in os.walk(Constants.STORAGE_PATH):
             # ask(Codes.make_dir, dir_name)
-            dir_name = dir_name.split()[home_path_length:]
+            dir_name = os.path.split(dir_name)[home_path_length:]
+
             if len(dir_name) > 0:
                 dir_name = os.path.join(*dir_name)
                 logger.print_debug_info("replicate dir {}".format(dir_name))
                 ask(Codes.make_dir, dir_name)
+            else:
+                dir_name = ''
 
             for file in file_list:
                 logger.print_debug_info("downloading all:", file)
                 sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
                 sock.connect((ip, Constants.STORAGE_TO_STORAGE))
-                full_path = os.path.join(os.path.abspath(dir_name), file)[len(Constants.STORAGE_PATH):]
+                full_path = os.path.join(dir_name, file)
                 ask(Codes.upload, full_path)
 
     @staticmethod
