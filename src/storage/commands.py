@@ -128,6 +128,11 @@ class CommandHandler:
         # to properly join
         full_path = full_path.strip(os.sep)
         os.makedirs(os.path.join(Constants.STORAGE_PATH, full_path), exist_ok=True)
+        if os.path.exists(full_path):
+            return True
+
+        logger.handle_error("Could not create path {}".format(full_path))
+        return False
         # os.system("mkdir -p {}".format(os.path.join(Constants.STORAGE_PATH, full_path)))
 
     @staticmethod
