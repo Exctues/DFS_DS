@@ -88,14 +88,16 @@ class CommandHandler:
                 sock.send(full_path.encode('utf-8'))
             sock.close()
 
+        home_path_length = os.path.split(Constants.STORAGE_PATH)
+
         # for all files
         for dir_name, subdir_list, file_list in os.walk(Constants.STORAGE_PATH):
             # ask(Codes.make_dir, dir_name)
-            print(dir_name)
-            for dir in subdir_list:
-                print(dir)
-
-            print()
+            dir_name = dir_name.split()[home_path_length:]
+            if len(dir_name) > 0:
+                dir_name = os.path.join(*dir_name)
+                logger.print_debug_info("replicate dir {}".format(dir_name))
+                ask(Codes.make_dir, dir_name)
 
             for file in file_list:
                 logger.print_debug_info("downloading all:", file)
