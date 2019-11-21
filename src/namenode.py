@@ -156,6 +156,7 @@ while True:
     soc.bind(('', Constants.CLIENT_TO_NAMENODE))
     soc.listen()
     while True:
+        print("Waiting for a new client connection")
         con, addr = soc.accept()  # addr is a tuple
         logger.print_debug_info('new client connection')
 

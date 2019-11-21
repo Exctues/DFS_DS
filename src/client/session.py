@@ -75,6 +75,7 @@ class Session:
             curr_dir = self.get_curr_dir().strip(parameters.sep)
 
             res = "{}{}{}{}".format(parameters.sep, curr_dir, parameters.sep, path.strip(parameters.sep))
+            res = parameters.sep + res.strip(parameters.sep)
         
         return res
 
@@ -203,7 +204,6 @@ class Session:
         for arg in args:
             sock.recv(1024)
             sock.send(arg.encode('utf-8'))
-
         if close_socket:
             # sock.shutdown(0)
             sock.close()
