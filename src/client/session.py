@@ -51,7 +51,6 @@ class Session:
         if part_path:
             part_path = part_path.strip(parameters.sep)
         else:
-            logger.handle_error("Path is not valid")
             return None
 
         res = "{}{}{}{}".format(parameters.sep, part_path, parameters.sep, 

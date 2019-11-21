@@ -138,7 +138,7 @@ class CommandConfig:
                 return
 
             is_dir = list(map(session.is_dir, args))
-            if any(args):
+            if 1 in is_dir:
                 idx = is_dir.index(1)
                 logger.handle_error("Path {} is not a file!".format(args[idx]))
                 return
@@ -154,6 +154,7 @@ class CommandConfig:
         @staticmethod
         def copy(session, args):
             args[0] = session.resolve_full_path(args[0])
+            args[1] = session.resolve_partial_path(args[1])
             if not all(args):
                 return
             session.send_command(Commands.copy, *args)
@@ -169,6 +170,8 @@ class CommandConfig:
         @staticmethod
         def cd(session, args):
             new_path = session.resolve_full_path(args[0])
+            if not new_path:
+                return
             is_dir = session.is_dir(new_path)
             if not new_path:
                 return
