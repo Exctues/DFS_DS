@@ -32,3 +32,6 @@ jobs:
 
         docker tag storage:$version $user/storage:$version
         docker push $user/storage:$version
+        
+    - name: Telegram Notify
+      uses: appleboy/telegram-action@0.0.3
