@@ -93,6 +93,7 @@ class CommandHandler:
         # for all files
         for dir_name, subdir_list, file_list in os.walk(Constants.STORAGE_PATH):
             # ask(Codes.make_dir, dir_name)
+            # TODO fix builing of names
             dir_name = os.path.split(dir_name)[home_path_length:]
 
             if len(dir_name) > 0:
