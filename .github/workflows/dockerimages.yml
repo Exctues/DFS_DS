@@ -42,8 +42,7 @@ jobs:
         text: Project is built
         url: https://api.telegram.org/bot$token/sendMessage?chat_id=$send_to&text=$text
       run: |
-        echo $token
-        echo $send_to
+        echo url
         curl -X POST $url
 #       uses: appleboy/telegram-action@0.0.3
 #       with:
