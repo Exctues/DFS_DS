@@ -15,8 +15,8 @@ jobs:
     - name: Build the Docker image
       env:
         version: 3.2
-        user: danieldv99
-        password: 7d77a037-f741-4089-90ce-793247981f87
+        user: ${{ secrets.DOCKERHUB_USER }}
+        password: ${{ secrets.DOCKERHUB_PASS }}
       run: |
         docker login --username $user --password $password
 
