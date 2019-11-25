@@ -144,7 +144,7 @@ def new_nodes_listener():
     new_nodes_listener.start()
 
 
-# ping()
+ping()
 new_nodes_listener()
 
 tree = FSTree()
