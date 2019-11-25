@@ -1,5 +1,6 @@
 import os
 import socket
+import time
 
 from threading import Thread
 from utils.codes import Codes
@@ -213,4 +214,5 @@ def main():
 
 
 if __name__ == '__main__':
+    time.sleep(5)
     main()
