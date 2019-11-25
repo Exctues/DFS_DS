@@ -167,7 +167,7 @@ class CommandHandler:
         # to properly join
         full_path = full_path.strip(os.sep)
         full_path = os.path.join(Constants.STORAGE_PATH, full_path)
-        os.rmdir(full_path)
+        shutil.rmtree(full_path)
 
     @staticmethod
     @logger.log
