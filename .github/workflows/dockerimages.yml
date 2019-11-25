@@ -35,17 +35,13 @@ jobs:
         
     - name: Telegram Notify
       env:
-#         token: ${{ secrets.TELEGRAM_TOKEN }}
-        token: 929739068:AAHsPCZgnB6s_az8tsu4G53ViXktu2Is-0U
-#         send_to: ${{ secrets.TELEGRAM_TO }}
-        send_to: 127170034
+        token: ${{ secrets.TELEGRAM_TOKEN }}
+        send_to: ${{ secrets.TELEGRAM_TO }}
         text: Project is built
-        url: https://api.telegram.org/bot$token/sendMessage?chat_id=$send_to&text=$text
-      run: |
-        echo url
-        curl -X POST $url
-#       uses: appleboy/telegram-action@0.0.3
-#       with:
-#         to: ${{ secrets.TELEGRAM_TO }}
-#         token: ${{ secrets.TELEGRAM_TOKEN }}
-#         message: "Build successful!"
+#         url: https://api.telegram.org/bot$token/sendMessage?chat_id=$send_to&text=$text
+
+      uses: appleboy/telegram-action@0.0.3
+      with:
+        to: $send_to
+        token: $token
+        message: $text
