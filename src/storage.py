@@ -117,7 +117,6 @@ def ping_listener():
 @logger.log
 def get_sync_storage_ip():
     sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-    logger.print_info(Constants.NAMENODE_ADDRESS, Constants.NEW_NODES_PORT)
     sock.connect((Constants.NAMENODE_ADDRESS, Constants.NEW_NODES_PORT))
     sock.send(str(Codes.init_new_storage).encode('utf-8'))
     sock.recv(1024)
@@ -195,7 +194,6 @@ def main():
     sock_storage.bind(('', Constants.STORAGE_TO_STORAGE))
     sock_storage.listen()
     a = Thread(target=waiter, args=(sock_storage, False))
-    a.start()
     # ping_listener()
     init_sync()
     # Create socket to communicate with namenode
@@ -204,6 +202,8 @@ def main():
     sock_namenode.bind(('', Constants.NAMENODE_TO_STORAGE))
     sock_namenode.listen()
     b = Thread(target=waiter, args=(sock_namenode, True))
+
+    a.start()
     b.start()
     a.join()
     b.join()
