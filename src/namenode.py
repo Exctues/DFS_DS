@@ -77,7 +77,7 @@ def ping():
         while True:
             time.sleep(10)
             for ip in clean_nodes.nodes.copy():
-                sock.sendto('ping'.encode('utf-8'), (ip, Constants.NAMENODE_TO_STORAGE))
+                sock.sendto('ping'.encode('utf-8'), (ip, Constants.STORAGE_PING))
                 try:
                     sock.recvfrom(1024)
                 except socket.timeout:
