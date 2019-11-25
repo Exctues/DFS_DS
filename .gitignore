@@ -109,5 +109,4 @@ venv.bak/
 
 docker/.ssh*
 
-src/test*
 src/Download*

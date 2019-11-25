@@ -143,9 +143,12 @@ class Session:
     @logger.log
     def handle_upload(command, args):
         assert len(args) == 2
-        if not os.path.exists(args[0]) or os.path.isdir(args[0]):
+        if not os.path.exists(args[0]):
             logger.handle_error("Incorrect host path specified!")
             return
+
+        if os.path.isdir(args[0]):
+            logger.handle_error("Uploading directories is not supported")
 
         size = str(os.path.getsize(args[0]))
 
@@ -185,8 +188,12 @@ class Session:
             host_file.write(res)
 
         sock.close()
-
-        logger.print_info(res.decode('utf-8'))
+        try:
+            res = res.decode('utf-8')
+        except UnicodeDecodeError:
+            res = "Received data could not be decoded as utf-8. Probably it is not text."
+        finally:
+            logger.print_info(res)
 
     @staticmethod
     @logger.log
