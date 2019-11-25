@@ -10,4 +10,4 @@ class Constants:
 
     STORAGE_PATH = '/home/dfs_storage'
 
-    PING_TIMEOUT = 10
+    PING_TIMEOUT = 15

@@ -109,6 +109,7 @@ def ping_listener():
         sock.bind(('', Constants.STORAGE_PING))
         while True:
             data, addr = sock.recvfrom(1024)
+            print(f"Got ping from {addr[0]}:{addr[1]}")
             sock.sendto('pong'.encode('utf-8'), addr)
 
     heartbeat_listen = Thread(target=ping_listener_thread)

@@ -77,9 +77,9 @@ def ping():
         while True:
             time.sleep(10)
             for ip in clean_nodes.nodes.copy():
-                sent = sock.sendto('ping'.encode('utf-8'), (ip, Constants.NAMENODE_TO_STORAGE))
+                sock.sendto('ping'.encode('utf-8'), (ip, Constants.NAMENODE_TO_STORAGE))
                 try:
-                    response, storagenode_addr = sock.recvfrom(1024)
+                    sock.recvfrom(1024)
                 except socket.timeout:
                     with clean_nodes.lock:
                         clean_nodes.nodes.discard(ip)
@@ -144,8 +144,8 @@ def new_nodes_listener():
     new_nodes_listener.start()
 
 
-ping()
 new_nodes_listener()
+ping()
 
 tree = FSTree()
 
