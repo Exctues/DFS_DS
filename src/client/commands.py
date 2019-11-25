@@ -143,6 +143,11 @@ class CommandConfig:
 
                 args.append(file_name)
 
+            path_exists = session.resolve_full_path(args[1])
+            if path_exists:
+                errors.path_already_exists(args[1])
+                return
+
             args[1] = session.resolve_partial_path(args[1])
 
             if not args[1]:
@@ -157,6 +162,7 @@ class CommandConfig:
             for arg in args:
                 if not arg:
                     errors.path_invalid(arg)
+                    return
 
             is_dir = list(map(session.is_dir, args))
             for i, answer in enumerate(is_dir):
@@ -172,6 +178,7 @@ class CommandConfig:
             for arg in args:
                 if not arg:
                     errors.path_invalid(arg)
+                    return
 
             session.handle_info(Commands.info, args)
 
