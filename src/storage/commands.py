@@ -92,10 +92,11 @@ class CommandHandler:
         # print("home_path_length", home_path_length)
         # for all files
         for dir_name, subdir_list, file_list in os.walk(Constants.STORAGE_PATH):
-            ask(Codes.make_dir, dir_name)
-
             # print("not processed", dir_name)
             dir_name = dir_name[home_path_length:]
+
+            ask(Codes.make_dir, dir_name)
+
             # print("processed", dir_name)
             if len(dir_name) > 0:
                 # dir_name = os.path.join(*dir_name)

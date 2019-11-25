@@ -156,9 +156,9 @@ while True:
     soc.bind(('', Constants.CLIENT_TO_NAMENODE))
     soc.listen()
     while True:
-        logger.print_info("Waiting for a new client connection")
+        logger.print_debug_info("Waiting for a new client connection")
         con, addr = soc.accept()  # addr is a tuple
-        logger.print_debug_info('new client connection')
+        logger.print_debug_info('New client connection')
 
         code = int(con.recv(1024).decode('utf-8'))
         logger.print_debug_info('Received code ' + str(code))
@@ -279,8 +279,9 @@ while True:
                 logger.print_debug_info('validate path send 1 ')
                 # ack
                 con.recv(1024)
-                con.send(path.get_path().encode('utf-8'))
-                logger.print_debug_info('validate path send path')
+                res = path.get_path()
+                con.send(res.encode('utf-8'))
+                logger.print_debug_info(f'validate {path} send {res}')
             else:
                 con.send(str(0).encode('utf-8'))
                 logger.print_debug_info('validate path send 0')
