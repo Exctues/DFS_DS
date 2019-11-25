@@ -1,3 +1,10 @@
 import socket
 import logger
-logger.print_debug_info(socket.gethostname())
+
+# maybe also check distribute?
+
+
+from storage.commands import CommandHandler
+
+print("Started")
+CommandHandler.handle_download_all((0, 0))

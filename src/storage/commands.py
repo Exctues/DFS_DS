@@ -88,26 +88,29 @@ class CommandHandler:
                 sock.send(full_path.encode('utf-8'))
             sock.close()
 
-        home_path_length = len(os.path.split(Constants.STORAGE_PATH))
-
+        home_path_length = len(Constants.STORAGE_PATH) + 1
+        # print("home_path_length", home_path_length)
         # for all files
         for dir_name, subdir_list, file_list in os.walk(Constants.STORAGE_PATH):
-            # ask(Codes.make_dir, dir_name)
-            # TODO fix builing of names
-            dir_name = os.path.split(dir_name)[home_path_length:]
+            ask(Codes.make_dir, dir_name)
 
+            # print("not processed", dir_name)
+            dir_name = dir_name[home_path_length:]
+            # print("processed", dir_name)
             if len(dir_name) > 0:
-                dir_name = os.path.join(*dir_name)
+                # dir_name = os.path.join(*dir_name)
                 logger.print_debug_info("replicate dir {}".format(dir_name))
+                # print("dir_name is", dir_name)
                 ask(Codes.make_dir, dir_name)
             else:
                 dir_name = ''
 
             for file in file_list:
-                logger.print_debug_info("downloading all:", file)
+                logger.print_debug_info("downloading all: current file is", file)
                 sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
                 sock.connect((ip, Constants.STORAGE_TO_STORAGE))
                 full_path = os.path.join(dir_name, file)
+                # print("fullpath is ", full_path)
                 ask(Codes.upload, full_path)
 
     @staticmethod
