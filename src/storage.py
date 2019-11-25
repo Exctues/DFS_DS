@@ -188,12 +188,17 @@ def waiter(sock: socket.socket, is_namenode):
 
 @logger.log
 def main():
+
     # Create socket to communicate with storages
     sock_storage = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     sock_storage.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
     sock_storage.bind(('', Constants.STORAGE_TO_STORAGE))
     sock_storage.listen()
     a = Thread(target=waiter, args=(sock_storage, False))
+    a.start()
+
+    ping_listener()
+    init_sync()
 
     # Create socket to communicate with namenode
     sock_namenode = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -201,12 +206,8 @@ def main():
     sock_namenode.bind(('', Constants.NAMENODE_TO_STORAGE))
     sock_namenode.listen()
     b = Thread(target=waiter, args=(sock_namenode, True))
-
-    ping_listener()
-    init_sync()
-
-    a.start()
     b.start()
+
     a.join()
     b.join()
 
