@@ -170,6 +170,7 @@ def init_sync():
     # When we receive ack then we are consistent with storage with 'storage_ip'
     sock.recv(1024)
     # Notify we are clear
+    logger.print_debug_info("Sending i_clear")
     notify_i_clear()
 
     sock.close()
