@@ -35,7 +35,6 @@ class Session:
                             None, is the path could not be found
         """
         res = self.__build_path(path)
-        logger.print_debug_info("built partial path:", res)
         path = res.split(parameters.sep)
         path = list(filter(lambda path: path != '', path))
 
@@ -91,7 +90,7 @@ class Session:
             sock.recv(1024)
             sock.send(path.encode('utf-8'))
             is_valid = (sock.recv(1024).decode('utf-8'))
-            logger.print_debug_info("RECEIVED", is_valid)
+
             try:
                 is_valid = int(is_valid)
             except:
@@ -99,12 +98,9 @@ class Session:
                 return False
 
             if is_valid:
-                logger.print_debug_info("Valid")
                 sock.send('ok'.encode('utf-8'))
                 true_path = sock.recv(1024).decode('utf-8')
             else:
-                logger.print_debug_info("Invalid")
-                logger.handle_error("Path {} is invalid!".format(path))
                 true_path = None
 
         return true_path
@@ -199,10 +195,13 @@ class Session:
         sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         sock.connect((Constants.NAMENODE_IP, Constants.CLIENT_TO_NAMENODE))
         sock.send(repr(command).encode('utf-8'))
+        # print(f"sent command {str(command)}")
 
         for arg in args:
             sock.recv(1024)
+            # print("received ack")
             sock.send(arg.encode('utf-8'))
+            # print(f"sent arg {arg}")
         if close_socket:
             # sock.shutdown(0)
             sock.close()

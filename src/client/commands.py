@@ -2,6 +2,7 @@ from utils.codes import Codes
 import utils.logger as logger
 import utils.parameters as parameters
 
+import errors
 
 class Messages:
     @staticmethod
@@ -99,21 +100,39 @@ class CommandConfig:
             session.send_command(Commands.init)
 
         @staticmethod
-        def make_file(session, args):
+        def __create_new_path(session, command, args):
+            real_paths = list(map(session.resolve_full_path, args))
+            for path in real_paths:
+                if path:
+                    errors.path_already_exists(path)
+                    return
+
             args = list(map(session.resolve_partial_path, args))
-            if not all(args):
-                return
-            CommandConfig.Actions.__n_args_handler(session.send_command, Commands.make_file, args)
+            for path in args:
+                if not path:
+                    errors.path_invalid(path)
+                    return
+
+            CommandConfig.Actions.__n_args_handler(session.send_command, command, args)
+
+        @staticmethod
+        def make_file(session, args):
+            CommandConfig.Actions.__create_new_path(session, Commands.make_file, args)
+
+        @staticmethod
+        def make_dir(session, args):
+            CommandConfig.Actions.__create_new_path(session, Commands.make_dir, args)
 
         @staticmethod
         def print(session, args):
             source = session.resolve_full_path(args[0])
             if not source:
+                errors.path_invalid(args[0])
                 return
 
             is_dir = session.is_dir(source)
             if is_dir:
-                logger.handle_error("{} is not a file!".format(args[0]))
+                errors.wrong_type(args[0], "file")
                 return
             session.handle_print(Commands.print, source)
 
@@ -127,6 +146,7 @@ class CommandConfig:
             args[1] = session.resolve_partial_path(args[1])
 
             if not args[1]:
+                errors.path_invalid(args[1])
                 return
 
             session.handle_upload(Commands.upload, args)
@@ -134,50 +154,63 @@ class CommandConfig:
         @staticmethod
         def rm(session, args):
             args = list(map(session.resolve_full_path, args))
-            if not all(args):
-                return
+            for arg in args:
+                if not arg:
+                    errors.path_invalid(arg)
 
             is_dir = list(map(session.is_dir, args))
-            if 1 in is_dir:
-                idx = is_dir.index(1)
-                logger.handle_error("Path {} is not a file!".format(args[idx]))
-                return
+            for i, answer in enumerate(is_dir):
+                if answer == 1:
+                    errors.wrong_type(args[i], "file")
+                    return
+
             CommandConfig.Actions.__n_args_handler(session.send_command, Commands.rm, args)
 
         @staticmethod
         def info(session, args):
             args = list(map(session.resolve_full_path, args))
-            if not all(args):
-                return
+            for arg in args:
+                if not arg:
+                    errors.path_invalid(arg)
+
             session.handle_info(Commands.info, args)
 
         @staticmethod
-        def copy(session, args):
+        def __copy_command(session, command, args):
             args[0] = session.resolve_full_path(args[0])
-            args[1] = session.resolve_partial_path(args[1])
-            if not all(args):
+            path_exists = session.resolve_full_path(args[1])
+
+            if path_exists:
+                errors.path_already_exists(args[1])
                 return
-            session.send_command(Commands.copy, *args)
+
+            args[1] = session.resolve_partial_path(args[1])
+            for arg in args:
+                if not arg:
+                    errors.path_invalid(arg)
+                    return
+
+            session.send_command(command, *args)
+
+        @staticmethod
+        def copy(session, args):
+            CommandConfig.Actions.__copy_command(session, Commands.copy, args)
 
         @staticmethod
         def move(session, args):
-            args[0] = session.resolve_full_path(args[0])
-            args[1] = session.resolve_partial_path(args[1])
-            if not all(args):
-                return
-            session.send_command(Commands.move, *args)
+            CommandConfig.Actions.__copy_command(session, Commands.move, args)
 
         @staticmethod
         def cd(session, args):
             new_path = session.resolve_full_path(args[0])
             if not new_path:
-                return
-            is_dir = session.is_dir(new_path)
-            if not new_path:
+                errors.path_invalid(new_path)
                 return
 
+            is_dir = session.is_dir(new_path)
             if not is_dir:
-                logger.handle_error("Not a directory!")
+                errors.wrong_type(new_path, "directory")
+                logger.handle_error(f"Path {new_path} is not a directory!")
                 return
 
             session.change_curr_dir(new_path)
@@ -192,6 +225,7 @@ class CommandConfig:
                 args.append(session.get_curr_dir())
             args[0] = session.resolve_full_path(args[0])
             if not args[0]:
+                errors.path_invalid(args[0])
                 return
 
             res = session.handle_ls(Commands.ls, args)
@@ -201,25 +235,21 @@ class CommandConfig:
                 logger.print_info('\n'.join(res))
 
         @staticmethod
-        def make_dir(session, args):
-            args = list(map(session.resolve_partial_path, args))
-            if not all(args):
-                return
-            CommandConfig.Actions.__n_args_handler(session.send_command, Commands.make_dir, args)
-
-        @staticmethod
         def rmdir(session, args):
             # validate and build paths
             args = list(map(session.resolve_full_path, args))
-            if not all(args):
-                return
+            for arg in args:
+                if not arg:
+                    errors.path_invalid(arg)
+                    return
 
             is_dir = list(map(session.is_dir, args))
-            if not all(is_dir):
-                idx = is_dir.index(0)
-                logger.handle_error("Path {} is not a directory!".format(args[idx]))
-                return
+            for i, answer in enumerate(is_dir):
+                if not answer:
+                    errors.wrong_type(args[i], "directory")
+                    return
 
+            to_remove = []
             for dir in args:
                 children = session.handle_ls(Commands.ls, [dir])
 
@@ -228,9 +258,15 @@ class CommandConfig:
                                       "Print \"yes\" to proceed, or anything else to abort operation.".format(dir))
                     response = input()
                     if response.strip(" ") != "yes":
-                        return
+                        logger.print_info(f"Directory {dir} will not be removed")
+                    else:
+                        logger.print_info(f"Directory {dir} will be removed")
+                        to_remove.append(dir)
 
-            CommandConfig.Actions.__n_args_handler(session.send_command, Commands.rmdir, args)
+                else:
+                    to_remove.append(dir)
+
+            CommandConfig.Actions.__n_args_handler(session.send_command, Commands.rmdir, to_remove)
 
         @staticmethod
         def help(session, args):
