@@ -80,7 +80,7 @@ def ping():
                 sock.sendto('ping'.encode('utf-8'), (ip, Constants.STORAGE_PING))
                 try:
                     sock.recvfrom(1024)
-                except socket.timeout:
+                except socket.timeout or socket.gaierror:
                     with clean_nodes.lock:
                         clean_nodes.nodes.discard(ip)
                     logger.print_debug_info('timeout storagenode', ip)

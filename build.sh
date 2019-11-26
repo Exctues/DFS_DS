@@ -17,3 +17,12 @@ docker push $USER/storage:$VERSION
 ## чтобы подключиться в сварм на воркинг ноде нужно к той команде которую swarm manager дает
 ## еще --advertise-addr publicip, и swarm init тожне надо с --advertise-addr publicip
 ## в константах
+
+
+## docker network create --driver overlay mynetwork
+
+# in compose
+# network:
+#   mynetwork:
+#     external: true
+
