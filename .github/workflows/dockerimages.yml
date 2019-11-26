@@ -39,4 +39,4 @@ jobs:
         send_to: ${{ secrets.TELEGRAM_TO }}
         text: Project is built
       run: |
-        curl "https://api.telegram.org/bot$token/sendMessage?chat_id=$send_to&text=$text"
+        curl "https://api.telegram.org/bot$token/sendMessage?chat_id=$send_to&text=$text&disable_notification=true"
