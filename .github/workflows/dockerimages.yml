@@ -38,7 +38,6 @@ jobs:
         token: ${{ secrets.TELEGRAM_TOKEN }} 
         send_to: ${{ secrets.TELEGRAM_TO }}
         text: Project is built
-        url: https://api.telegram.org/bot$token/sendMessage?chat_id=$send_to&text=$text
       run: |
         echo $url
-        curl $url
+        curl "https://api.telegram.org/bot$token/sendMessage?chat_id=$send_to&text=$text"
