@@ -10,7 +10,7 @@ It is written in Python using sockets.
 Dependencies are:
 
 
-Project exists because of 3 people
-Alexander Andryukov
-Daniil Dvoryanov
-Roman Bogachev
+Project exists because of 3 people:
+Alexander Andryukov,
+Daniil Dvoryanov,
+Roman Bogachev.
