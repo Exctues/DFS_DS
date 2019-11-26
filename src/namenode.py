@@ -77,8 +77,9 @@ def ping():
         while True:
             time.sleep(10)
             for ip in clean_nodes.nodes.copy():
-                sock.sendto('ping'.encode('utf-8'), (ip, Constants.STORAGE_PING))
                 try:
+                    sock.sendto('ping'.encode('utf-8'), (ip, Constants.STORAGE_PING))
+
                     sock.recvfrom(1024)
                 except:
                         # socket.timeout or socket.gaierror:
